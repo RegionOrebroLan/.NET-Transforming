@@ -1,0 +1,74 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2024
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Global", ".Global", "{B43BB3AA-24D2-476D-A76A-6B2594B20D81}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CodeAnalysis", "CodeAnalysis", "{D734BD6D-7E97-4A37-B9F8-D33B8A5B2C17}"
+	ProjectSection(SolutionItems) = preProject
+		.Global\CodeAnalysis\All-Rules-As-Error.ruleset = .Global\CodeAnalysis\All-Rules-As-Error.ruleset
+		.Global\CodeAnalysis\Solution-dictionary.xml = .Global\CodeAnalysis\Solution-dictionary.xml
+		.Global\CodeAnalysis\Solution-suppressions.cs = .Global\CodeAnalysis\Solution-suppressions.cs
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documents", "Documents", "{2C8DC573-E638-44F4-AA67-7C5923A64A7B}"
+	ProjectSection(SolutionItems) = preProject
+		..\ReadMe.md = ..\ReadMe.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuGet", "NuGet", "{629F6291-17DC-434F-BC32-66E9CF23AF2C}"
+	ProjectSection(SolutionItems) = preProject
+		NuGet.config = NuGet.config
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Settings", "Settings", "{58D04ED7-6C2E-4DD3-A0A1-10F76D22EA94}"
+	ProjectSection(SolutionItems) = preProject
+		..\.gitignore = ..\.gitignore
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Signing", "Signing", "{B6F026FC-5428-4A9C-8CDE-7C40DA054853}"
+	ProjectSection(SolutionItems) = preProject
+		.Global\Signing\ReadMe.md = .Global\Signing\ReadMe.md
+		.Global\Signing\StrongName.Development.snk = .Global\Signing\StrongName.Development.snk
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Project", "Project\Project.csproj", "{24454FF2-01A6-4008-A34F-E0B3CEE77164}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Integration-tests", "Integration-tests\Integration-tests.csproj", "{CDC7DF46-1203-4A16-AFA6-D71E07264F1B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Unit-tests", "Unit-tests\Unit-tests.csproj", "{3667F05D-31F2-4BA3-B072-A18ADCD750C1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{24454FF2-01A6-4008-A34F-E0B3CEE77164}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24454FF2-01A6-4008-A34F-E0B3CEE77164}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24454FF2-01A6-4008-A34F-E0B3CEE77164}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24454FF2-01A6-4008-A34F-E0B3CEE77164}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CDC7DF46-1203-4A16-AFA6-D71E07264F1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDC7DF46-1203-4A16-AFA6-D71E07264F1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDC7DF46-1203-4A16-AFA6-D71E07264F1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDC7DF46-1203-4A16-AFA6-D71E07264F1B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3667F05D-31F2-4BA3-B072-A18ADCD750C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3667F05D-31F2-4BA3-B072-A18ADCD750C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3667F05D-31F2-4BA3-B072-A18ADCD750C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3667F05D-31F2-4BA3-B072-A18ADCD750C1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D734BD6D-7E97-4A37-B9F8-D33B8A5B2C17} = {B43BB3AA-24D2-476D-A76A-6B2594B20D81}
+		{2C8DC573-E638-44F4-AA67-7C5923A64A7B} = {B43BB3AA-24D2-476D-A76A-6B2594B20D81}
+		{629F6291-17DC-434F-BC32-66E9CF23AF2C} = {B43BB3AA-24D2-476D-A76A-6B2594B20D81}
+		{58D04ED7-6C2E-4DD3-A0A1-10F76D22EA94} = {B43BB3AA-24D2-476D-A76A-6B2594B20D81}
+		{B6F026FC-5428-4A9C-8CDE-7C40DA054853} = {B43BB3AA-24D2-476D-A76A-6B2594B20D81}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CEFB899D-853C-4336-8F00-AFCC15228D63}
+	EndGlobalSection
+EndGlobal
