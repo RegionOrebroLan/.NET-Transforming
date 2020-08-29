@@ -69,6 +69,9 @@ namespace RegionOrebroLan.Transforming
 			if(this.Handlers.TryGetValue(extension, out var packageHandler))
 				return packageHandler;
 
+			if(!this.FileSystem.File.Exists(path))
+				return this.Handlers[string.Empty];
+
 			throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "Could not get {0} for {1} \"{2}\".", handlerType, pathType, path));
 		}
 

@@ -81,6 +81,32 @@ namespace RegionOrebroLan.Transforming.IntegrationTests
 		}
 
 		[TestMethod]
+		public void Transform_IfTheDestinationDirectoryContainsADot_ShouldTransformCorrectly()
+		{
+			var destination = this.GetOutputPath("My.Transformed-Package");
+			var fileToTransformPatterns = new[] {@"**\*.config*", @"**\*.json", @"**\*.xml"};
+			var pathToDeletePatterns = new[] {@"**\Directory-To-Delete\*", @"**\File-To-Delete.*"};
+			var source = this.GetTestResourcePath(this.GetRandomPackageName("Package"));
+			var transformationNames = new[] {"Release", "Test"};
+
+			this.PackageTransformer.Transform(true, destination, fileToTransformPatterns, pathToDeletePatterns, source, transformationNames);
+
+			if(!Directory.Exists(destination))
+			{
+				var extractedDestination = this.GetOutputPath(Guid.NewGuid().ToString());
+				ZipFile.ExtractToDirectory(destination, extractedDestination);
+				destination = extractedDestination;
+			}
+
+			var expected = this.GetTestResourcePath("Package-Expected");
+
+			var actualItems = this.GetFileSystemEntries(destination).ToArray();
+			var expectedItems = this.GetFileSystemEntries(expected).ToArray();
+
+			Assert.IsTrue(actualItems.SequenceEqual(expectedItems, new FileComparer(destination, expected)));
+		}
+
+		[TestMethod]
 		[ExpectedException(typeof(ArgumentException))]
 		public void Transform_IfTheDestinationParameterIsEmpty_ShouldThrowAnArgumentException()
 		{
@@ -146,6 +172,32 @@ namespace RegionOrebroLan.Transforming.IntegrationTests
 			}
 
 			Assert.AreEqual(0, this.GetFileSystemEntries(destination).Count());
+		}
+
+		[TestMethod]
+		public void Transform_IfTheSourceDirectoryContainsADot_ShouldTransformCorrectly()
+		{
+			var destination = this.GetOutputPath(this.GetRandomPackageName("Transformed-Package"));
+			var fileToTransformPatterns = new[] {@"**\*.config*", @"**\*.json", @"**\*.xml"};
+			var pathToDeletePatterns = new[] {@"**\Directory-To-Delete\*", @"**\File-To-Delete.*"};
+			var source = this.GetTestResourcePath("My.Package");
+			var transformationNames = new[] {"Release", "Test"};
+
+			this.PackageTransformer.Transform(true, destination, fileToTransformPatterns, pathToDeletePatterns, source, transformationNames);
+
+			if(!Directory.Exists(destination))
+			{
+				var extractedDestination = this.GetOutputPath(Guid.NewGuid().ToString());
+				ZipFile.ExtractToDirectory(destination, extractedDestination);
+				destination = extractedDestination;
+			}
+
+			var expected = this.GetTestResourcePath("Package-Expected");
+
+			var actualItems = this.GetFileSystemEntries(destination).ToArray();
+			var expectedItems = this.GetFileSystemEntries(expected).ToArray();
+
+			Assert.IsTrue(actualItems.SequenceEqual(expectedItems, new FileComparer(destination, expected)));
 		}
 
 		[TestMethod]
