@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO.Abstractions;
 using System.Linq;
@@ -125,6 +126,7 @@ namespace RegionOrebroLan.Transforming
 			return (includePatterns ?? Enumerable.Empty<string>()).SelectMany(item => this.GetFileSystemEntryPathMatches(action, directoryPath, item, validate));
 		}
 
+		[SuppressMessage("Style", "IDE0046:Convert to conditional expression")]
 		protected internal virtual IEnumerable<string> GetFileSystemEntryPathsToDelete(string directoryPath, IEnumerable<string> pathToDeletePatterns)
 		{
 			var fileSystemEntryPathsToDelete = this.GetFileSystemEntryPathMatches("delete", directoryPath, pathToDeletePatterns).Select(match => this.FileSystem.Path.IsPathRooted(match) ? match : this.FileSystem.Path.Combine(directoryPath, match)).ToArray();
