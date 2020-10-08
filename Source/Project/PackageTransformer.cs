@@ -140,6 +140,31 @@ namespace RegionOrebroLan.Transforming
 			return path?.Substring(0, path.Length - this.FileSystem.Path.GetExtension(path).Length);
 		}
 
+		protected internal virtual IEnumerable<string> GetSourcesForTransformation(string path)
+		{
+			var sources = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+			// ReSharper disable InvertIf
+			if(this.FileSystem.File.Exists(path))
+			{
+				var pathWithoutExtension = this.GetPathWithoutExtension(path);
+				var extension = this.FileSystem.Path.GetExtension(path);
+
+				while(pathWithoutExtension.Contains('.'))
+				{
+					var lastIndexOfDot = pathWithoutExtension.LastIndexOf('.');
+					pathWithoutExtension = pathWithoutExtension.Substring(0, lastIndexOfDot);
+					var source = $"{pathWithoutExtension}{extension}";
+
+					if(this.FileSystem.File.Exists(source))
+						sources.Add(source);
+				}
+			}
+			// ReSharper restore InvertIf
+
+			return sources;
+		}
+
 		protected internal virtual IDictionary<string, IDictionary<string, bool>> GetTransformInformation(string directoryPath, IEnumerable<string> fileToTransformPatterns, IEnumerable<string> transformationNames)
 		{
 			transformationNames = (transformationNames ?? Enumerable.Empty<string>()).ToArray();
@@ -171,9 +196,9 @@ namespace RegionOrebroLan.Transforming
 			return transformInformation;
 		}
 
-		protected internal virtual IDictionary<string, IList<string>> GetTransformMap(string directoryPath, IEnumerable<string> fileToTransformPatterns)
+		protected internal virtual IDictionary<string, ISet<string>> GetTransformMap(string directoryPath, IEnumerable<string> fileToTransformPatterns)
 		{
-			var transformMap = new Dictionary<string, IList<string>>(StringComparer.OrdinalIgnoreCase);
+			var transformMap = new Dictionary<string, ISet<string>>(StringComparer.OrdinalIgnoreCase);
 
 			var filePathsInvolvedInTransformation = this.GetFilePathsToTransform(directoryPath, fileToTransformPatterns).ToArray();
 
@@ -181,16 +206,16 @@ namespace RegionOrebroLan.Transforming
 			{
 				var fullPath = this.FileSystem.Path.IsPathRooted(path) ? path : this.FileSystem.Path.Combine(directoryPath, path);
 
-				if(!this.TryGetSourceForTransformation(fullPath, out var source))
-					continue;
-
-				if(!transformMap.TryGetValue(source, out var list))
+				foreach(var source in this.GetSourcesForTransformation(fullPath))
 				{
-					list = new List<string>();
-					transformMap.Add(source, list);
-				}
+					if(!transformMap.TryGetValue(source, out var set))
+					{
+						set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+						transformMap.Add(source, set);
+					}
 
-				list.Add(fullPath);
+					set.Add(fullPath);
+				}
 			}
 
 			return transformMap;
@@ -299,29 +324,6 @@ namespace RegionOrebroLan.Transforming
 				if(cleanup && this.FileSystem.Directory.Exists(temporaryDirectoryPath))
 					this.FileSystem.Directory.Delete(temporaryDirectoryPath, true);
 			}
-		}
-
-		protected internal virtual bool TryGetSourceForTransformation(string path, out string source)
-		{
-			source = null;
-
-			if(!this.FileSystem.File.Exists(path))
-				return false;
-
-			var filePathWithoutExtension = this.GetPathWithoutExtension(path);
-
-			var lastIndexOfDot = filePathWithoutExtension.LastIndexOf(".", StringComparison.OrdinalIgnoreCase);
-
-			if(lastIndexOfDot < 0)
-				return false;
-
-			source = path.Substring(0, lastIndexOfDot) + this.FileSystem.Path.GetExtension(path);
-
-			if(this.FileSystem.File.Exists(source))
-				return true;
-
-			source = null;
-			return false;
 		}
 
 		protected internal virtual void ValidateFileSystemEntryPathMatch(string action, string directoryPath, string fileSystemEntryPathMatch)

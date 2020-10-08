@@ -55,6 +55,338 @@ namespace RegionOrebroLan.Transforming.IntegrationTests
 		}
 
 		[TestMethod]
+		public void GetSourcesForTransformation_Test()
+		{
+			var directoryPath = this.GetTestResourcePath("My.Simple.Package");
+
+			var path = Path.Combine(directoryPath, "Web.1.2.3.4.5.config");
+			var sources = this.PackageTransformer.GetSourcesForTransformation(path).ToArray();
+			Assert.AreEqual(2, sources.Length);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.config"), sources[0]);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.config"), sources[1]);
+
+			path = Path.Combine(directoryPath, "Web.1.2.3.config");
+			sources = this.PackageTransformer.GetSourcesForTransformation(path).ToArray();
+			Assert.AreEqual(1, sources.Length);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.config"), sources[0]);
+
+			path = Path.Combine(directoryPath, "Web.AB.CDE.FGHI.config");
+			sources = this.PackageTransformer.GetSourcesForTransformation(path).ToArray();
+			Assert.AreEqual(1, sources.Length);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.config"), sources[0]);
+
+			path = Path.Combine(directoryPath, "Web.config");
+			sources = this.PackageTransformer.GetSourcesForTransformation(path).ToArray();
+			Assert.AreEqual(0, sources.Length);
+
+			path = Path.Combine(directoryPath, "Web.Release.config");
+			sources = this.PackageTransformer.GetSourcesForTransformation(path).ToArray();
+			Assert.AreEqual(1, sources.Length);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.config"), sources[0]);
+
+			path = Path.Combine(directoryPath, "Web.Test.config");
+			sources = this.PackageTransformer.GetSourcesForTransformation(path).ToArray();
+			Assert.AreEqual(1, sources.Length);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.config"), sources[0]);
+
+			path = Path.Combine(directoryPath, "Web.That-Should.Not-Be.Used.config");
+			sources = this.PackageTransformer.GetSourcesForTransformation(path).ToArray();
+			Assert.AreEqual(1, sources.Length);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.config"), sources[0]);
+		}
+
+		[TestMethod]
+		public void GetTransformInformation_Test()
+		{
+			var manyTransformationNames = new[] {"Release", "Test", "1.2.3.4.5", "AB.CDE.FGHI", "NON.EXISTING.DOT.NAME"};
+			var noTransformationNames = Enumerable.Empty<string>().ToArray();
+
+			var directoryPath = this.GetTestResourcePath("My.Package.With.Multiple.Dots");
+			var fileToTransformPatterns = new[] {@"**\*.config*"};
+			var transformationNames = noTransformationNames;
+			var transformInformation = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames);
+			Assert.AreEqual(2, transformInformation.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, @"Views\Web.config"), transformInformation.ElementAt(0).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.config"), transformInformation.ElementAt(1).Key);
+
+			transformationNames = manyTransformationNames;
+			transformInformation = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames);
+			Assert.AreEqual(2, transformInformation.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, @"Views\Web.config"), transformInformation.ElementAt(0).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.config"), transformInformation.ElementAt(1).Key);
+
+			fileToTransformPatterns = new[] {@"**\*.config*", @"**\*.json", @"**\*.xml"};
+			transformationNames = noTransformationNames;
+			transformInformation = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames);
+			Assert.AreEqual(6, transformInformation.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, @"Views\Web.config"), transformInformation.ElementAt(0).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.config"), transformInformation.ElementAt(1).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, @"Directory\JSON-file.json"), transformInformation.ElementAt(2).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "AppSettings.json"), transformInformation.ElementAt(3).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "Settings.For.json"), transformInformation.ElementAt(4).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, @"Directory\XML-file.xml"), transformInformation.ElementAt(5).Key);
+
+			transformationNames = manyTransformationNames;
+			transformInformation = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames);
+			Assert.AreEqual(6, transformInformation.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, @"Views\Web.config"), transformInformation.ElementAt(0).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.config"), transformInformation.ElementAt(1).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, @"Directory\JSON-file.json"), transformInformation.ElementAt(2).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "AppSettings.json"), transformInformation.ElementAt(3).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "Settings.For.json"), transformInformation.ElementAt(4).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, @"Directory\XML-file.xml"), transformInformation.ElementAt(5).Key);
+
+			fileToTransformPatterns = new[] {@"**\*.xml", @"**\*.json", @"**\*.config*"};
+			transformationNames = noTransformationNames;
+			transformInformation = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames);
+			Assert.AreEqual(6, transformInformation.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, @"Directory\XML-file.xml"), transformInformation.ElementAt(0).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, @"Directory\JSON-file.json"), transformInformation.ElementAt(1).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "AppSettings.json"), transformInformation.ElementAt(2).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "Settings.For.json"), transformInformation.ElementAt(3).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, @"Views\Web.config"), transformInformation.ElementAt(4).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.config"), transformInformation.ElementAt(5).Key);
+
+			transformationNames = manyTransformationNames;
+			transformInformation = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames);
+			Assert.AreEqual(6, transformInformation.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, @"Directory\XML-file.xml"), transformInformation.ElementAt(0).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, @"Directory\JSON-file.json"), transformInformation.ElementAt(1).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "AppSettings.json"), transformInformation.ElementAt(2).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "Settings.For.json"), transformInformation.ElementAt(3).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, @"Views\Web.config"), transformInformation.ElementAt(4).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.config"), transformInformation.ElementAt(5).Key);
+
+			directoryPath = this.GetTestResourcePath("My.Simple.Package");
+			fileToTransformPatterns = new[] {@"**\*.config*"};
+			transformationNames = noTransformationNames;
+			transformInformation = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames);
+			Assert.AreEqual(2, transformInformation.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.config"), transformInformation.ElementAt(0).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.config"), transformInformation.ElementAt(1).Key);
+
+			transformationNames = manyTransformationNames;
+			transformInformation = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames);
+			Assert.AreEqual(2, transformInformation.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.config"), transformInformation.ElementAt(0).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.config"), transformInformation.ElementAt(1).Key);
+
+			transformationNames = new[] {"4.5"};
+			transformInformation = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames);
+			Assert.AreEqual(2, transformInformation.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.config"), transformInformation.ElementAt(0).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.config"), transformInformation.ElementAt(1).Key);
+
+			fileToTransformPatterns = new[] {@"**\*.config*", @"**\*.json", @"**\*.xml"};
+			transformationNames = noTransformationNames;
+			transformInformation = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames);
+			Assert.AreEqual(2, transformInformation.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.config"), transformInformation.ElementAt(0).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.config"), transformInformation.ElementAt(1).Key);
+
+			transformationNames = manyTransformationNames;
+			transformInformation = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames);
+			Assert.AreEqual(2, transformInformation.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.config"), transformInformation.ElementAt(0).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.config"), transformInformation.ElementAt(1).Key);
+
+			fileToTransformPatterns = new[] {@"**\*.config*"};
+			transformationNames = manyTransformationNames;
+			var transformEntries = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames).ElementAt(0).Value;
+			Assert.AreEqual(1, transformEntries.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.4.5.config"), transformEntries.ElementAt(0).Key);
+			Assert.IsTrue(transformEntries.ElementAt(0).Value);
+
+			transformEntries = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames).ElementAt(1).Value;
+			Assert.AreEqual(6, transformEntries.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.Release.config"), transformEntries.ElementAt(0).Key);
+			Assert.IsTrue(transformEntries.ElementAt(0).Value);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.Test.config"), transformEntries.ElementAt(1).Key);
+			Assert.IsTrue(transformEntries.ElementAt(1).Value);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.4.5.config"), transformEntries.ElementAt(2).Key);
+			Assert.IsTrue(transformEntries.ElementAt(2).Value);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.AB.CDE.FGHI.config"), transformEntries.ElementAt(3).Key);
+			Assert.IsTrue(transformEntries.ElementAt(3).Value);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.config"), transformEntries.ElementAt(4).Key);
+			Assert.IsFalse(transformEntries.ElementAt(4).Value);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.That-Should.Not-Be.Used.config"), transformEntries.ElementAt(5).Key);
+			Assert.IsFalse(transformEntries.ElementAt(5).Value);
+
+			transformationNames = noTransformationNames;
+			transformEntries = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames).ElementAt(0).Value;
+			Assert.AreEqual(1, transformEntries.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.4.5.config"), transformEntries.ElementAt(0).Key);
+			Assert.IsFalse(transformEntries.ElementAt(0).Value);
+
+			transformEntries = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames).ElementAt(1).Value;
+			Assert.AreEqual(6, transformEntries.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.4.5.config"), transformEntries.ElementAt(0).Key);
+			Assert.IsFalse(transformEntries.ElementAt(0).Value);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.config"), transformEntries.ElementAt(1).Key);
+			Assert.IsFalse(transformEntries.ElementAt(1).Value);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.AB.CDE.FGHI.config"), transformEntries.ElementAt(2).Key);
+			Assert.IsFalse(transformEntries.ElementAt(2).Value);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.Release.config"), transformEntries.ElementAt(3).Key);
+			Assert.IsFalse(transformEntries.ElementAt(3).Value);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.Test.config"), transformEntries.ElementAt(4).Key);
+			Assert.IsFalse(transformEntries.ElementAt(4).Value);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.That-Should.Not-Be.Used.config"), transformEntries.ElementAt(5).Key);
+			Assert.IsFalse(transformEntries.ElementAt(5).Value);
+
+			transformationNames = new[] {"4.5"};
+			transformEntries = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames).ElementAt(0).Value;
+			Assert.AreEqual(1, transformEntries.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.4.5.config"), transformEntries.ElementAt(0).Key);
+			Assert.IsTrue(transformEntries.ElementAt(0).Value);
+
+			transformEntries = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames).ElementAt(1).Value;
+			Assert.AreEqual(6, transformEntries.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.4.5.config"), transformEntries.ElementAt(0).Key);
+			Assert.IsTrue(transformEntries.ElementAt(0).Value);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.config"), transformEntries.ElementAt(1).Key);
+			Assert.IsFalse(transformEntries.ElementAt(1).Value);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.AB.CDE.FGHI.config"), transformEntries.ElementAt(2).Key);
+			Assert.IsFalse(transformEntries.ElementAt(2).Value);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.Release.config"), transformEntries.ElementAt(3).Key);
+			Assert.IsFalse(transformEntries.ElementAt(3).Value);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.Test.config"), transformEntries.ElementAt(4).Key);
+			Assert.IsFalse(transformEntries.ElementAt(4).Value);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.That-Should.Not-Be.Used.config"), transformEntries.ElementAt(5).Key);
+			Assert.IsFalse(transformEntries.ElementAt(5).Value);
+
+			transformationNames = new[] {"Test"};
+			transformEntries = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames).ElementAt(0).Value;
+			Assert.AreEqual(1, transformEntries.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.4.5.config"), transformEntries.ElementAt(0).Key);
+			Assert.IsFalse(transformEntries.ElementAt(0).Value);
+
+			transformEntries = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames).ElementAt(1).Value;
+			Assert.AreEqual(6, transformEntries.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.Test.config"), transformEntries.ElementAt(0).Key);
+			Assert.IsTrue(transformEntries.ElementAt(0).Value);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.4.5.config"), transformEntries.ElementAt(1).Key);
+			Assert.IsFalse(transformEntries.ElementAt(1).Value);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.config"), transformEntries.ElementAt(2).Key);
+			Assert.IsFalse(transformEntries.ElementAt(2).Value);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.AB.CDE.FGHI.config"), transformEntries.ElementAt(3).Key);
+			Assert.IsFalse(transformEntries.ElementAt(3).Value);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.Release.config"), transformEntries.ElementAt(4).Key);
+			Assert.IsFalse(transformEntries.ElementAt(4).Value);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.That-Should.Not-Be.Used.config"), transformEntries.ElementAt(5).Key);
+			Assert.IsFalse(transformEntries.ElementAt(5).Value);
+
+			transformationNames = new[] {"Test", "AB.CDE.FGHI"};
+			transformEntries = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames).ElementAt(0).Value;
+			Assert.AreEqual(1, transformEntries.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.4.5.config"), transformEntries.ElementAt(0).Key);
+			Assert.IsFalse(transformEntries.ElementAt(0).Value);
+
+			transformEntries = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames).ElementAt(1).Value;
+			Assert.AreEqual(6, transformEntries.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.Test.config"), transformEntries.ElementAt(0).Key);
+			Assert.IsTrue(transformEntries.ElementAt(0).Value);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.AB.CDE.FGHI.config"), transformEntries.ElementAt(1).Key);
+			Assert.IsTrue(transformEntries.ElementAt(1).Value);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.4.5.config"), transformEntries.ElementAt(2).Key);
+			Assert.IsFalse(transformEntries.ElementAt(2).Value);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.config"), transformEntries.ElementAt(3).Key);
+			Assert.IsFalse(transformEntries.ElementAt(3).Value);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.Release.config"), transformEntries.ElementAt(4).Key);
+			Assert.IsFalse(transformEntries.ElementAt(4).Value);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.That-Should.Not-Be.Used.config"), transformEntries.ElementAt(5).Key);
+			Assert.IsFalse(transformEntries.ElementAt(5).Value);
+		}
+
+		[TestMethod]
+		public void GetTransformMap_Test()
+		{
+			var directoryPath = this.GetTestResourcePath("My.Package.With.Multiple.Dots");
+			var fileToTransformPatterns = new[] {@"**\*.config*"};
+			var transformMap = this.PackageTransformer.GetTransformMap(directoryPath, fileToTransformPatterns);
+			Assert.AreEqual(2, transformMap.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, @"Views\Web.config"), transformMap.ElementAt(0).Key);
+			Assert.AreEqual(4, transformMap.ElementAt(0).Value.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, @"Views\Web.1.2.3.4.5.config"), transformMap.ElementAt(0).Value.ElementAt(0));
+			Assert.AreEqual(Path.Combine(directoryPath, @"Views\Web.AB.CDE.FGHI.config"), transformMap.ElementAt(0).Value.ElementAt(1));
+			Assert.AreEqual(Path.Combine(directoryPath, @"Views\Web.Release.config"), transformMap.ElementAt(0).Value.ElementAt(2));
+			Assert.AreEqual(Path.Combine(directoryPath, @"Views\Web.Test.config"), transformMap.ElementAt(0).Value.ElementAt(3));
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.config"), transformMap.ElementAt(1).Key);
+			Assert.AreEqual(5, transformMap.ElementAt(1).Value.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.4.5.config"), transformMap.ElementAt(1).Value.ElementAt(0));
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.AB.CDE.FGHI.config"), transformMap.ElementAt(1).Value.ElementAt(1));
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.Release.config"), transformMap.ElementAt(1).Value.ElementAt(2));
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.Test.config"), transformMap.ElementAt(1).Value.ElementAt(3));
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.That-Should.Not-Be.Used.config"), transformMap.ElementAt(1).Value.ElementAt(4));
+
+			fileToTransformPatterns = new[] {@"**\*.config*", @"**\*.json", @"**\*.xml"};
+			transformMap = this.PackageTransformer.GetTransformMap(directoryPath, fileToTransformPatterns);
+			Assert.AreEqual(6, transformMap.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, @"Views\Web.config"), transformMap.ElementAt(0).Key);
+			Assert.AreEqual(4, transformMap.ElementAt(0).Value.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, @"Views\Web.1.2.3.4.5.config"), transformMap.ElementAt(0).Value.ElementAt(0));
+			Assert.AreEqual(Path.Combine(directoryPath, @"Views\Web.AB.CDE.FGHI.config"), transformMap.ElementAt(0).Value.ElementAt(1));
+			Assert.AreEqual(Path.Combine(directoryPath, @"Views\Web.Release.config"), transformMap.ElementAt(0).Value.ElementAt(2));
+			Assert.AreEqual(Path.Combine(directoryPath, @"Views\Web.Test.config"), transformMap.ElementAt(0).Value.ElementAt(3));
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.config"), transformMap.ElementAt(1).Key);
+			Assert.AreEqual(5, transformMap.ElementAt(1).Value.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.4.5.config"), transformMap.ElementAt(1).Value.ElementAt(0));
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.AB.CDE.FGHI.config"), transformMap.ElementAt(1).Value.ElementAt(1));
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.Release.config"), transformMap.ElementAt(1).Value.ElementAt(2));
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.Test.config"), transformMap.ElementAt(1).Value.ElementAt(3));
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.That-Should.Not-Be.Used.config"), transformMap.ElementAt(1).Value.ElementAt(4));
+			Assert.AreEqual(Path.Combine(directoryPath, @"Directory\JSON-file.json"), transformMap.ElementAt(2).Key);
+			Assert.AreEqual(2, transformMap.ElementAt(2).Value.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, @"Directory\JSON-file.Dummy.json"), transformMap.ElementAt(2).Value.ElementAt(0));
+			Assert.AreEqual(Path.Combine(directoryPath, @"Directory\JSON-file.Test.json"), transformMap.ElementAt(2).Value.ElementAt(1));
+			Assert.AreEqual(Path.Combine(directoryPath, "AppSettings.json"), transformMap.ElementAt(3).Key);
+			Assert.AreEqual(4, transformMap.ElementAt(3).Value.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, "AppSettings.1.2.3.4.5.json"), transformMap.ElementAt(3).Value.ElementAt(0));
+			Assert.AreEqual(Path.Combine(directoryPath, "AppSettings.AB.CDE.FGHI.json"), transformMap.ElementAt(3).Value.ElementAt(1));
+			Assert.AreEqual(Path.Combine(directoryPath, "AppSettings.Release.json"), transformMap.ElementAt(3).Value.ElementAt(2));
+			Assert.AreEqual(Path.Combine(directoryPath, "AppSettings.Test.json"), transformMap.ElementAt(3).Value.ElementAt(3));
+			Assert.AreEqual(Path.Combine(directoryPath, "Settings.For.json"), transformMap.ElementAt(4).Key);
+			Assert.AreEqual(4, transformMap.ElementAt(4).Value.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, "Settings.For.1.2.3.4.5.json"), transformMap.ElementAt(4).Value.ElementAt(0));
+			Assert.AreEqual(Path.Combine(directoryPath, "Settings.For.AB.CDE.FGHI.json"), transformMap.ElementAt(4).Value.ElementAt(1));
+			Assert.AreEqual(Path.Combine(directoryPath, "Settings.For.Release.json"), transformMap.ElementAt(4).Value.ElementAt(2));
+			Assert.AreEqual(Path.Combine(directoryPath, "Settings.For.Test.json"), transformMap.ElementAt(4).Value.ElementAt(3));
+			Assert.AreEqual(Path.Combine(directoryPath, @"Directory\XML-file.xml"), transformMap.ElementAt(5).Key);
+			Assert.AreEqual(1, transformMap.ElementAt(5).Value.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, @"Directory\XML-file.Release.xml"), transformMap.ElementAt(5).Value.ElementAt(0));
+
+			directoryPath = this.GetTestResourcePath("My.Simple.Package");
+			fileToTransformPatterns = new[] {@"**\*.config*"};
+			transformMap = this.PackageTransformer.GetTransformMap(directoryPath, fileToTransformPatterns);
+			Assert.AreEqual(2, transformMap.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.config"), transformMap.ElementAt(0).Key);
+			Assert.AreEqual(1, transformMap.ElementAt(0).Value.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.4.5.config"), transformMap.ElementAt(0).Value.ElementAt(0));
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.config"), transformMap.ElementAt(1).Key);
+			Assert.AreEqual(6, transformMap.ElementAt(1).Value.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.4.5.config"), transformMap.ElementAt(1).Value.ElementAt(0));
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.config"), transformMap.ElementAt(1).Value.ElementAt(1));
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.AB.CDE.FGHI.config"), transformMap.ElementAt(1).Value.ElementAt(2));
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.Release.config"), transformMap.ElementAt(1).Value.ElementAt(3));
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.Test.config"), transformMap.ElementAt(1).Value.ElementAt(4));
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.That-Should.Not-Be.Used.config"), transformMap.ElementAt(1).Value.ElementAt(5));
+
+			fileToTransformPatterns = new[] {@"**\*.config*", @"**\*.json", @"**\*.xml"};
+			transformMap = this.PackageTransformer.GetTransformMap(directoryPath, fileToTransformPatterns);
+			Assert.AreEqual(2, transformMap.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.config"), transformMap.ElementAt(0).Key);
+			Assert.AreEqual(1, transformMap.ElementAt(0).Value.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.4.5.config"), transformMap.ElementAt(0).Value.ElementAt(0));
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.config"), transformMap.ElementAt(1).Key);
+			Assert.AreEqual(6, transformMap.ElementAt(1).Value.Count);
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.4.5.config"), transformMap.ElementAt(1).Value.ElementAt(0));
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.config"), transformMap.ElementAt(1).Value.ElementAt(1));
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.AB.CDE.FGHI.config"), transformMap.ElementAt(1).Value.ElementAt(2));
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.Release.config"), transformMap.ElementAt(1).Value.ElementAt(3));
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.Test.config"), transformMap.ElementAt(1).Value.ElementAt(4));
+			Assert.AreEqual(Path.Combine(directoryPath, "Web.That-Should.Not-Be.Used.config"), transformMap.ElementAt(1).Value.ElementAt(5));
+		}
+
+		[TestMethod]
 		[ExpectedException(typeof(InvalidOperationException))]
 		public void Transform_IfAnyPathToDeleteIsOutsideTheTransformDirectory_ShouldThrowAnInvalidOperationException()
 		{
@@ -193,6 +525,32 @@ namespace RegionOrebroLan.Transforming.IntegrationTests
 			}
 
 			var expected = this.GetTestResourcePath("Package-Expected");
+
+			var actualItems = this.GetFileSystemEntries(destination).ToArray();
+			var expectedItems = this.GetFileSystemEntries(expected).ToArray();
+
+			Assert.IsTrue(actualItems.SequenceEqual(expectedItems, new FileComparer(destination, expected)));
+		}
+
+		[TestMethod]
+		public void Transform_IfTheSourceDirectoryContainsMultipleDotsAndTransformationNamesContainsDots_ShouldTransformCorrectly()
+		{
+			var destination = this.GetOutputPath(this.GetRandomPackageName("Transformed-Package"));
+			var fileToTransformPatterns = new[] {@"**\*.config*", @"**\*.json", @"**\*.xml"};
+			var pathToDeletePatterns = new[] {@"**\Directory-To-Delete\*", @"**\File-To-Delete.*"};
+			var source = this.GetTestResourcePath("My.Package.With.Multiple.Dots");
+			var transformationNames = new[] {"Release", "Test", "1.2.3.4.5", "AB.CDE.FGHI", "NON.EXISTING.DOT.NAME"};
+
+			this.PackageTransformer.Transform(true, destination, fileToTransformPatterns, pathToDeletePatterns, source, transformationNames);
+
+			if(!Directory.Exists(destination))
+			{
+				var extractedDestination = this.GetOutputPath(Guid.NewGuid().ToString());
+				ZipFile.ExtractToDirectory(destination, extractedDestination);
+				destination = extractedDestination;
+			}
+
+			var expected = this.GetTestResourcePath("My.Package.With.Multiple.Dots-Expected");
 
 			var actualItems = this.GetFileSystemEntries(destination).ToArray();
 			var expectedItems = this.GetFileSystemEntries(expected).ToArray();
