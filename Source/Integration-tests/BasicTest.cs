@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -69,9 +68,11 @@ namespace RegionOrebroLan.Transforming.IntegrationTests
 
 		[ClassInitialize]
 		[CLSCompliant(false)]
-		[SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "testContext")]
 		public static void Initialize(TestContext testContext)
 		{
+			if(testContext == null)
+				throw new ArgumentNullException(nameof(testContext));
+
 			DeleteDirectoryIfItExists(_outputDirectoryPath);
 		}
 
