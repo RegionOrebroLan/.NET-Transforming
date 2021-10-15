@@ -46,8 +46,7 @@ namespace RegionOrebroLan.Transforming.IntegrationTests
 
 		[ClassCleanup]
 		[CLSCompliant(false)]
-		[SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "testContext")]
-		public static void Cleanup(TestContext testContext)
+		public static void Cleanup()
 		{
 			DeleteDirectoryIfItExists(_outputDirectoryPath);
 		}
