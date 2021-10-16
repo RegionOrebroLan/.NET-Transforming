@@ -1,5 +1,0 @@
-<Project>
-	<Target Name="EnsureFolders" BeforeTargets="BeforeBuild">
-		<MakeDir Condition="!Exists('%(Folder.FullPath)')" Directories="%(Folder.FullPath)" />
-	</Target>
-</Project>
