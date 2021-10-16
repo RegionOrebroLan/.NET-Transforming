@@ -1,4 +1,4 @@
-﻿namespace RegionOrebroLan.Transforming
+namespace RegionOrebroLan.Transforming
 {
 	public interface IFileTransformerFactory
 	{
