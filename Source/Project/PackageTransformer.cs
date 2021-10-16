@@ -13,7 +13,7 @@ namespace RegionOrebroLan.Transforming
 	{
 		#region Fields
 
-		private static readonly IEnumerable<char> _pathPatternSeparators = new[] {';'};
+		private static readonly IEnumerable<char> _pathPatternSeparators = new[] { ';' };
 
 		#endregion
 
