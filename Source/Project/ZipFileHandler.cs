@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.IO;
 using System.IO.Abstractions;
@@ -29,6 +29,13 @@ namespace RegionOrebroLan.Transforming
 		public virtual void Extract(string destination, string source)
 		{
 			ZipFile.ExtractToDirectory(source, destination);
+
+			// To handle non .NET Framework target-frameworks.
+			// Eg. NET 5.0 and NET Core 3.1: Extracting an empty archive does not create an empty directory.
+#if !NETFRAMEWORK
+			if(!Directory.Exists(destination))
+				Directory.CreateDirectory(destination);
+#endif
 		}
 
 		public virtual void Write(string destination, string source)
