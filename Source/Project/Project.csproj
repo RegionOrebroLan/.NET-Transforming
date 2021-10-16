@@ -27,7 +27,7 @@
 		<PackageReference Include="Microsoft.VisualStudio.Jdt" Version="0.9.23" />
 		<PackageReference Include="Microsoft.Web.Xdt" Version="3.1.0" />
 		<PackageReference Include="RegionOrebroLan.IO" Version="1.0.0" />
-		<PackageReference Include="System.IO.Abstractions" Version="2.1.0.231" />
+		<PackageReference Include="System.IO.Abstractions" Version="13.2.47" />
 		<PackageReference Include="System.IO.Compression" Version="4.3.0" />
 	</ItemGroup>
 	<Target Name="HandleAssemblyOriginatorKeyFile" BeforeTargets="BeforeBuild" Condition="$(SignAssembly) AND !Exists('$(AssemblyOriginatorKeyFile)')">
