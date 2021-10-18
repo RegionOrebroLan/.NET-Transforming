@@ -1,8 +1,8 @@
 using System;
 using System.Globalization;
 using System.IO;
-using System.IO.Abstractions;
 using System.IO.Compression;
+using RegionOrebroLan.Transforming.IO;
 using RegionOrebroLan.Transforming.IO.Extensions;
 
 namespace RegionOrebroLan.Transforming
@@ -55,8 +55,8 @@ namespace RegionOrebroLan.Transforming
 			}
 			catch
 			{
-				if(directoryToDeleteOnError != null && this.FileSystem.Directory.Exists(directoryToDeleteOnError.FullName))
-					this.FileSystem.Directory.Delete(directoryToDeleteOnError.FullName);
+				if(directoryToDeleteOnError != null && this.FileSystem.Directory.Exists(directoryToDeleteOnError))
+					this.FileSystem.Directory.Delete(directoryToDeleteOnError);
 
 				throw;
 			}

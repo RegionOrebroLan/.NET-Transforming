@@ -1,10 +1,10 @@
 using System;
-using System.IO.Abstractions;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using RegionOrebroLan.IO;
 using RegionOrebroLan.Transforming;
+using RegionOrebroLan.Transforming.IO;
 
 namespace UnitTests
 {
@@ -28,14 +28,14 @@ namespace UnitTests
 				{
 					var fileSystemMock = new Mock<IFileSystem>();
 
-					var directoryBaseMock = new Mock<DirectoryBase>(fileSystemMock.Object) { CallBase = true };
-					directoryBaseMock.Setup(directoryBase => directoryBase.Exists(It.IsAny<string>())).Returns(false);
+					var directoryMock = new Mock<IDirectory>();
+					directoryMock.Setup(directory => directory.Exists(It.IsAny<string>())).Returns(false);
 
-					var fileBaseMock = new Mock<FileBase>(fileSystemMock.Object) { CallBase = true };
-					fileBaseMock.Setup(fileBase => fileBase.Exists(It.IsAny<string>())).Returns(false);
+					var fileMock = new Mock<IFile>();
+					fileMock.Setup(file => file.Exists(It.IsAny<string>())).Returns(false);
 
-					fileSystemMock.Setup(fileSystem => fileSystem.Directory).Returns(directoryBaseMock.Object);
-					fileSystemMock.Setup(fileSystem => fileSystem.File).Returns(fileBaseMock.Object);
+					fileSystemMock.Setup(fileSystem => fileSystem.Directory).Returns(directoryMock.Object);
+					fileSystemMock.Setup(fileSystem => fileSystem.File).Returns(fileMock.Object);
 
 					_packageTransformer = new PackageTransformer(Mock.Of<IFileSystemEntryMatcher>(), fileSystemMock.Object, Mock.Of<IFileTransformerFactory>(), Mock.Of<IPackageHandlerLoader>());
 				}

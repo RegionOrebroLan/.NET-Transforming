@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Abstractions;
 using System.IO.Compression;
 using System.Linq;
 using IntegrationTests.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RegionOrebroLan.IO;
 using RegionOrebroLan.Transforming;
+using RegionOrebroLan.Transforming.IO;
 
 namespace IntegrationTests
 {

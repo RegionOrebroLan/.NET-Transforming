@@ -1,8 +1,8 @@
 using System;
 using System.IO;
-using System.IO.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RegionOrebroLan.Transforming;
+using RegionOrebroLan.Transforming.IO;
 
 namespace IntegrationTests
 {

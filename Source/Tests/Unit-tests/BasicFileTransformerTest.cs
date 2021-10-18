@@ -1,8 +1,8 @@
 using System;
-using System.IO.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using RegionOrebroLan.Transforming;
+using RegionOrebroLan.Transforming.IO;
 
 namespace UnitTests
 {
@@ -27,10 +27,10 @@ namespace UnitTests
 				{
 					var fileSystemMock = new Mock<IFileSystem>();
 
-					var fileBaseMock = new Mock<FileBase>(fileSystemMock.Object) { CallBase = true };
-					fileBaseMock.Setup(fileBase => fileBase.Exists(It.IsAny<string>())).Returns<string>(path => string.Equals(path, this.ExistingPath, StringComparison.OrdinalIgnoreCase));
+					var fileMock = new Mock<IFile>();
+					fileMock.Setup(file => file.Exists(It.IsAny<string>())).Returns<string>(path => string.Equals(path, this.ExistingPath, StringComparison.OrdinalIgnoreCase));
 
-					fileSystemMock.Setup(fileSystem => fileSystem.File).Returns(fileBaseMock.Object);
+					fileSystemMock.Setup(fileSystem => fileSystem.File).Returns(fileMock.Object);
 
 					_basicFileTransformer = new Mock<BasicFileTransformer>(fileSystemMock.Object) { CallBase = true }.Object;
 				}

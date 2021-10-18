@@ -1,7 +1,7 @@
 using System.IO;
-using System.IO.Abstractions;
 using System.Text;
 using Microsoft.VisualStudio.Jdt;
+using RegionOrebroLan.Transforming.IO;
 using RegionOrebroLan.Transforming.IO.Extensions;
 
 namespace RegionOrebroLan.Transforming

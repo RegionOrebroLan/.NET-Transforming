@@ -1,7 +1,6 @@
 using System;
 using System.Globalization;
 using System.IO;
-using System.IO.Abstractions;
 using System.Text;
 
 namespace RegionOrebroLan.Transforming.IO.Extensions
@@ -40,7 +39,7 @@ namespace RegionOrebroLan.Transforming.IO.Extensions
 			return fileSystem.Directory.Exists(path) || fileSystem.File.Exists(path);
 		}
 
-		public static DirectoryInfoBase GetRequiredTopAncestorDirectoryForFile(this IFileSystem fileSystem, string filePath)
+		public static string GetRequiredTopAncestorDirectoryForFile(this IFileSystem fileSystem, string filePath)
 		{
 			if(fileSystem == null)
 				throw new ArgumentNullException(nameof(fileSystem));
@@ -60,7 +59,7 @@ namespace RegionOrebroLan.Transforming.IO.Extensions
 			}
 			// ReSharper restore All
 
-			return requiredTopAncestorDirectory != null ? new DirectoryInfoWrapper(fileSystem, requiredTopAncestorDirectory) : null;
+			return requiredTopAncestorDirectory?.FullName;
 		}
 
 		public static void WriteFile(this IFileSystem fileSystem, string content, Encoding encoding, string path)
@@ -80,8 +79,8 @@ namespace RegionOrebroLan.Transforming.IO.Extensions
 			}
 			catch
 			{
-				if(directoryToDeleteOnError != null && fileSystem.Directory.Exists(directoryToDeleteOnError.FullName))
-					fileSystem.Directory.Delete(directoryToDeleteOnError.FullName);
+				if(directoryToDeleteOnError != null && fileSystem.Directory.Exists(directoryToDeleteOnError))
+					fileSystem.Directory.Delete(directoryToDeleteOnError);
 
 				throw;
 			}
