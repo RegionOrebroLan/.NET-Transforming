@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup Label="Initial">
 		<Company>Region Örebro län</Company>
-		<VersionPrefix>2.0.1</VersionPrefix>
+		<VersionPrefix>2.1.0</VersionPrefix>
 		<VersionPrereleaseName></VersionPrereleaseName>
 	</PropertyGroup>
 	<PropertyGroup Label="Assembly">
