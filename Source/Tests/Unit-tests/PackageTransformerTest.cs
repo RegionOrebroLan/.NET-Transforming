@@ -97,6 +97,41 @@ namespace UnitTests
 			this.ValidateSourceParameterException<ArgumentException>(() => { this.PackageTransformer.Transform(false, "Test", Enumerable.Empty<string>(), Enumerable.Empty<string>(), " ", Enumerable.Empty<string>()); });
 		}
 
+		[TestMethod]
+		public void ValidateFilePath_IfAllParametersAreNull_ShouldNotThrowAnExceptions()
+		{
+			this.PackageTransformer.ValidateFilePath(null, null, null);
+		}
+
+		[TestMethod]
+		public void ValidateFilePath_IfTheFilePathParameterIsAnEmptyString_ShouldNotThrowAnExceptions()
+		{
+			this.ValidateFilePathShouldNotThrowAnExceptions(string.Empty);
+		}
+
+		[TestMethod]
+		public void ValidateFilePath_IfTheFilePathParameterIsNull_ShouldNotThrowAnExceptions()
+		{
+			this.ValidateFilePathShouldNotThrowAnExceptions(null);
+		}
+
+		[TestMethod]
+		public void ValidateFilePath_IfTheFilePathParameterIsOnlyWhitespaces_ShouldNotThrowAnExceptions()
+		{
+			this.ValidateFilePathShouldNotThrowAnExceptions("    ");
+		}
+
+		protected internal virtual void ValidateFilePathShouldNotThrowAnExceptions(string filePath)
+		{
+			this.PackageTransformer.ValidateFilePath(null, null, filePath);
+			this.PackageTransformer.ValidateFilePath(null, string.Empty, filePath);
+			this.PackageTransformer.ValidateFilePath(string.Empty, null, filePath);
+			this.PackageTransformer.ValidateFilePath(string.Empty, string.Empty, filePath);
+			this.PackageTransformer.ValidateFilePath(null, "Test", filePath);
+			this.PackageTransformer.ValidateFilePath("Test", null, filePath);
+			this.PackageTransformer.ValidateFilePath("Test", "Test", filePath);
+		}
+
 		#endregion
 	}
 }

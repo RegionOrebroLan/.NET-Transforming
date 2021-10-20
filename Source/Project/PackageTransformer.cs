@@ -335,10 +335,25 @@ namespace RegionOrebroLan.Transforming
 			if(!this.FileSystem.Path.IsPathRooted(filePath))
 				return;
 
+			if(!Uri.TryCreate(filePath, UriKind.RelativeOrAbsolute, out var fileUri))
+				throw new ArgumentException($"Could neither create an absolute uri nor a relative uri from file-path \"{filePath}\".", nameof(filePath));
+
+			if(!fileUri.IsAbsoluteUri)
+				return;
+
+			if(directoryPath == null)
+				throw new ArgumentNullException(nameof(directoryPath));
+
+			if(!Uri.TryCreate($"{directoryPath.TrimEnd('/', '\\')}\\", UriKind.Absolute, out var directoryUri))
+				throw new ArgumentException($"Could not create an absolute uri from directory-path \"{directoryPath}\".", nameof(directoryPath));
+
+			if(this.PathsAreEqual(directoryPath, filePath))
+				throw new InvalidOperationException($"The directory-path and file-path can not be equal.");
+
 			// We are not allowed to delete files outside the directory-path.
 			// We can not transform files outside the directory-path because we can not resolve the destination for those files.
-			if(!new Uri(directoryPath).IsBaseOf(new Uri(filePath)))
-				throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "It is not allowed to {0} the file \"{1}\". The file is outside the directory-path \"{2}\".", action, filePath, directoryPath));
+			if(!directoryUri.IsBaseOf(fileUri))
+				throw new InvalidOperationException($"It is not allowed to {action} the file \"{filePath}\". The file is outside the directory-path \"{directoryPath}\".");
 		}
 
 		#endregion

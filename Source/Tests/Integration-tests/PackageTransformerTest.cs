@@ -673,6 +673,90 @@ namespace IntegrationTests
 			Assert.IsTrue(actualItems.SequenceEqual(expectedItems, new FileComparer(destination, expected)));
 		}
 
+		[TestMethod]
+		[ExpectedException(typeof(InvalidOperationException))]
+		public void ValidateFilePath_IfTheDirectoryIsNotABaseOfTheFile_ShouldThrowAnInvalidOperationException()
+		{
+			const string action = "test";
+			var exceptions = new List<InvalidOperationException>();
+
+			foreach(var directoryPath in new[] { @"C:\Some-directory", @"C:\Some-directory\" })
+			{
+				foreach(var filePath in new[] { @"C:\Some-other-directory\Some-file.txt", @"C:\Some-other-directory\", @"C:\Some-other-directory" })
+				{
+					try
+					{
+						this.PackageTransformer.ValidateFilePath(action, directoryPath, filePath);
+					}
+					catch(InvalidOperationException invalidOperationException)
+					{
+						if(string.Equals(invalidOperationException.Message, $"It is not allowed to {action} the file \"{filePath}\". The file is outside the directory-path \"{directoryPath}\".", StringComparison.Ordinal))
+							exceptions.Add(invalidOperationException);
+					}
+				}
+			}
+
+			if(exceptions.Count == 6)
+				throw exceptions.First();
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(ArgumentException))]
+		public void ValidateFilePath_IfTheDirectoryPathIsRelative_ShouldThrowAnArgumentException()
+		{
+			var exceptions = new List<ArgumentException>();
+
+			foreach(var directoryPath in new[] { "Directory", "/Directory", @"\Directory" })
+			{
+				try
+				{
+					this.PackageTransformer.ValidateFilePath("Test", directoryPath, @"C:\Test.txt");
+				}
+				catch(ArgumentException argumentException)
+				{
+					if(string.Equals(argumentException.ParamName, nameof(directoryPath), StringComparison.Ordinal) && argumentException.Message.StartsWith($"Could not create an absolute uri from directory-path \"{directoryPath}\".", StringComparison.Ordinal))
+						exceptions.Add(argumentException);
+				}
+			}
+
+			if(exceptions.Count == 3)
+				throw exceptions.First();
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(InvalidOperationException))]
+		public void ValidateFilePath_IfTheDirectoryPathParameterAndTheFilePathParameterAreEqual_ShouldThrowAnInvalidOperationException()
+		{
+			const string directoryPath = @"C:\Some-directory";
+
+			try
+			{
+				this.PackageTransformer.ValidateFilePath("Test", directoryPath, directoryPath);
+			}
+			catch(InvalidOperationException invalidOperationException)
+			{
+				if(string.Equals(invalidOperationException.Message, "The directory-path and file-path can not be equal.", StringComparison.Ordinal))
+					throw;
+			}
+		}
+
+		[TestMethod]
+		public void ValidateFilePath_IfTheFilePathParameterIsARelativePath_ShouldNotThrowAnExceptions()
+		{
+			this.ValidateFilePathShouldNotThrowAnExceptions("Text.txt");
+			this.ValidateFilePathShouldNotThrowAnExceptions("/Text.txt");
+			this.ValidateFilePathShouldNotThrowAnExceptions(@"\Text.txt");
+			this.ValidateFilePathShouldNotThrowAnExceptions("Directory/Text.txt");
+			this.ValidateFilePathShouldNotThrowAnExceptions(@"Directory\Text.txt");
+			this.ValidateFilePathShouldNotThrowAnExceptions("/Directory/Text.txt");
+			this.ValidateFilePathShouldNotThrowAnExceptions(@"\Directory\Text.txt");
+		}
+
+		protected internal virtual void ValidateFilePathShouldNotThrowAnExceptions(string filePath)
+		{
+			this.PackageTransformer.ValidateFilePath("Test", @"C:\Some-directory", filePath);
+		}
+
 		protected internal virtual void ValidateTransformDestinationParameterException<T>(string destination) where T : ArgumentException
 		{
 			this.ValidateDestinationParameterException<T>(() => { this.PackageTransformer.Transform(true, destination, null, null, this.GetTestResourcePath("Empty-directory"), null); });
