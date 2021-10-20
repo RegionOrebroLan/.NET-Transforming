@@ -44,6 +44,57 @@ namespace IntegrationTests.IO
 		}
 
 		[TestMethod]
+		public void Find_IncludePattern_Test()
+		{
+			var directoryPath = Path.Combine(this.TestResourceDirectory.FullName, "Package");
+			var fileSearcher = new FileSearcher();
+
+			var filePaths = fileSearcher.Find(directoryPath, null, new[] { "Directory-To-Delete" }).ToArray();
+			Assert.IsFalse(filePaths.Any());
+
+			filePaths = fileSearcher.Find(directoryPath, null, new[] { "/Directory-To-Delete" }).ToArray();
+			Assert.IsFalse(filePaths.Any());
+
+			filePaths = fileSearcher.Find(directoryPath, null, new[] { "Directory-To-Delete/**" }).ToArray();
+			Assert.IsFalse(filePaths.Any());
+
+			filePaths = fileSearcher.Find(directoryPath, null, new[] { "/Directory-To-Delete/**" }).ToArray();
+			Assert.IsFalse(filePaths.Any());
+
+			filePaths = fileSearcher.Find(directoryPath, null, new[] { "Directory-To-Delete/**/*" }).ToArray();
+			Assert.IsFalse(filePaths.Any());
+
+			filePaths = fileSearcher.Find(directoryPath, null, new[] { "/Directory-To-Delete/**/*" }).ToArray();
+			Assert.IsFalse(filePaths.Any());
+
+			filePaths = fileSearcher.Find(directoryPath, null, new[] { "**/Directory-To-Delete" }).ToArray();
+			Assert.IsFalse(filePaths.Any());
+
+			filePaths = fileSearcher.Find(directoryPath, null, new[] { "/**/Directory-To-Delete" }).ToArray();
+			Assert.IsFalse(filePaths.Any());
+
+			filePaths = fileSearcher.Find(directoryPath, null, new[] { "**/Directory-To-Delete/**" }).ToArray();
+			Assert.AreEqual(2, filePaths.Length);
+			Assert.AreEqual("Directory/Directory-To-Delete/File-To-Delete-1.txt", filePaths[0]);
+			Assert.AreEqual("Directory/Directory-To-Delete/File-To-Delete-2.txt", filePaths[1]);
+
+			filePaths = fileSearcher.Find(directoryPath, null, new[] { "/**/Directory-To-Delete/**" }).ToArray();
+			Assert.AreEqual(2, filePaths.Length);
+			Assert.AreEqual("Directory/Directory-To-Delete/File-To-Delete-1.txt", filePaths[0]);
+			Assert.AreEqual("Directory/Directory-To-Delete/File-To-Delete-2.txt", filePaths[1]);
+
+			filePaths = fileSearcher.Find(directoryPath, null, new[] { "**/Directory-To-Delete/**/*" }).ToArray();
+			Assert.AreEqual(2, filePaths.Length);
+			Assert.AreEqual("Directory/Directory-To-Delete/File-To-Delete-1.txt", filePaths[0]);
+			Assert.AreEqual("Directory/Directory-To-Delete/File-To-Delete-2.txt", filePaths[1]);
+
+			filePaths = fileSearcher.Find(directoryPath, null, new[] { "/**/Directory-To-Delete/**/*" }).ToArray();
+			Assert.AreEqual(2, filePaths.Length);
+			Assert.AreEqual("Directory/Directory-To-Delete/File-To-Delete-1.txt", filePaths[0]);
+			Assert.AreEqual("Directory/Directory-To-Delete/File-To-Delete-2.txt", filePaths[1]);
+		}
+
+		[TestMethod]
 		public void Find_ShouldNotReturnAnyHitsForAnAbsoluteIncludePattern()
 		{
 			var fileSearcher = new FileSearcher();
