@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
-using RegionOrebroLan.IO;
 using RegionOrebroLan.Transforming.IO;
 using RegionOrebroLan.Transforming.IO.Extensions;
 
@@ -19,9 +18,9 @@ namespace RegionOrebroLan.Transforming
 
 		#region Constructors
 
-		public PackageTransformer(IFileSystemEntryMatcher fileSystemEntryMatcher, IFileSystem fileSystem, IFileTransformerFactory fileTransformerFactory, IPackageHandlerLoader packageHandlerLoader)
+		public PackageTransformer(IFileSearcher fileSearcher, IFileSystem fileSystem, IFileTransformerFactory fileTransformerFactory, IPackageHandlerLoader packageHandlerLoader)
 		{
-			this.FileSystemEntryMatcher = fileSystemEntryMatcher ?? throw new ArgumentNullException(nameof(fileSystemEntryMatcher));
+			this.FileSearcher = fileSearcher ?? throw new ArgumentNullException(nameof(fileSearcher));
 			this.FileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
 			this.FileTransformerFactory = fileTransformerFactory ?? throw new ArgumentNullException(nameof(fileTransformerFactory));
 			this.PackageHandlerLoader = packageHandlerLoader ?? throw new ArgumentNullException(nameof(packageHandlerLoader));
@@ -31,8 +30,8 @@ namespace RegionOrebroLan.Transforming
 
 		#region Properties
 
+		protected internal virtual IFileSearcher FileSearcher { get; }
 		protected internal virtual IFileSystem FileSystem { get; }
-		protected internal virtual IFileSystemEntryMatcher FileSystemEntryMatcher { get; }
 		protected internal virtual IFileTransformerFactory FileTransformerFactory { get; }
 		protected internal virtual IPackageHandlerLoader PackageHandlerLoader { get; }
 		protected internal virtual IEnumerable<char> PathPatternSeparators => _pathPatternSeparators;
@@ -45,23 +44,23 @@ namespace RegionOrebroLan.Transforming
 		{
 			var directoriesToCheckForDelete = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-			foreach(var fileSystemEntryPathToDelete in this.GetFileSystemEntryPathsToDelete(directoryPath, pathToDeletePatterns))
+			foreach(var filePathToDelete in this.GetFilePathsToDelete(directoryPath, pathToDeletePatterns))
 			{
-				if(this.FileSystem.Directory.Exists(fileSystemEntryPathToDelete))
+				if(this.FileSystem.Directory.Exists(filePathToDelete))
 				{
-					this.FileSystem.Directory.Delete(fileSystemEntryPathToDelete, true);
+					this.FileSystem.Directory.Delete(filePathToDelete, true);
 					continue;
 				}
 
-				if(!this.FileSystem.File.Exists(fileSystemEntryPathToDelete))
+				if(!this.FileSystem.File.Exists(filePathToDelete))
 					continue;
 
-				var directoryName = this.FileSystem.Path.GetDirectoryName(fileSystemEntryPathToDelete);
+				var directoryName = this.FileSystem.Path.GetDirectoryName(filePathToDelete);
 
 				if(!this.PathsAreEqual(directoryName, directoryPath))
-					directoriesToCheckForDelete.Add(this.FileSystem.Path.GetDirectoryName(fileSystemEntryPathToDelete));
+					directoriesToCheckForDelete.Add(this.FileSystem.Path.GetDirectoryName(filePathToDelete));
 
-				this.FileSystem.File.Delete(fileSystemEntryPathToDelete);
+				this.FileSystem.File.Delete(filePathToDelete);
 			}
 
 			foreach(var directoryToCheckForDelete in directoriesToCheckForDelete)
@@ -69,29 +68,24 @@ namespace RegionOrebroLan.Transforming
 				if(!this.FileSystem.Directory.Exists(directoryToCheckForDelete))
 					continue;
 
-				if(this.FileSystem.Directory.EnumerateFileSystemEntries(directoryToCheckForDelete).Any())
+				if(this.FindFiles(directoryToCheckForDelete, "**/*").Any())
 					continue;
 
-				this.FileSystem.Directory.Delete(directoryToCheckForDelete);
+				this.FileSystem.Directory.Delete(directoryToCheckForDelete, true);
 			}
 		}
 
-		protected internal virtual IEnumerable<string> GetFilePathsToTransform(string directoryPath, IEnumerable<string> fileToTransformPatterns)
+		protected internal virtual IEnumerable<string> FindFiles(string directoryPath, string includePattern)
 		{
-			return this.GetFileSystemEntryPathMatches("transform", directoryPath, fileToTransformPatterns);
+			return this.FileSearcher.Find(directoryPath, null, new[] { includePattern }).Select(filePath => filePath.Replace(this.FileSystem.Path.AltDirectorySeparatorChar, this.FileSystem.Path.DirectorySeparatorChar));
 		}
 
-		protected internal virtual IEnumerable<string> GetFileSystemEntryPathMatches(string directoryPath, string includePattern)
+		protected internal virtual IEnumerable<string> FindFiles(string action, string directoryPath, IEnumerable<string> includePatterns)
 		{
-			return this.FileSystemEntryMatcher.GetPathMatches(directoryPath, null, includePattern);
+			return this.FindFiles(action, directoryPath, includePatterns, true);
 		}
 
-		protected internal virtual IEnumerable<string> GetFileSystemEntryPathMatches(string action, string directoryPath, IEnumerable<string> includePatterns)
-		{
-			return this.GetFileSystemEntryPathMatches(action, directoryPath, includePatterns, true);
-		}
-
-		protected internal virtual IEnumerable<string> GetFileSystemEntryPathMatches(string action, string directoryPath, string includePattern, bool validate)
+		protected internal virtual IEnumerable<string> FindFiles(string action, string directoryPath, string includePattern, bool validate)
 		{
 			var pathMatches = new List<string>();
 
@@ -103,17 +97,17 @@ namespace RegionOrebroLan.Transforming
 					if(string.IsNullOrWhiteSpace(part))
 						continue;
 
-					var fileSystemEntryPathMatches = this.GetFileSystemEntryPathMatches(directoryPath, part).ToArray();
+					var filePaths = this.FindFiles(directoryPath, part).ToArray();
 
 					if(validate)
 					{
-						foreach(var fileSystemEntryPathMatch in fileSystemEntryPathMatches)
+						foreach(var filePath in filePaths)
 						{
-							this.ValidateFileSystemEntryPathMatch(action, directoryPath, fileSystemEntryPathMatch);
+							this.ValidateFilePath(action, directoryPath, filePath);
 						}
 					}
 
-					pathMatches.AddRange(fileSystemEntryPathMatches);
+					pathMatches.AddRange(filePaths);
 				}
 			}
 			// ReSharper restore InvertIf
@@ -121,20 +115,25 @@ namespace RegionOrebroLan.Transforming
 			return pathMatches.ToArray();
 		}
 
-		protected internal virtual IEnumerable<string> GetFileSystemEntryPathMatches(string action, string directoryPath, IEnumerable<string> includePatterns, bool validate)
+		protected internal virtual IEnumerable<string> FindFiles(string action, string directoryPath, IEnumerable<string> includePatterns, bool validate)
 		{
-			return (includePatterns ?? Enumerable.Empty<string>()).SelectMany(item => this.GetFileSystemEntryPathMatches(action, directoryPath, item, validate));
+			return (includePatterns ?? Enumerable.Empty<string>()).SelectMany(item => this.FindFiles(action, directoryPath, item, validate));
 		}
 
 		[SuppressMessage("Style", "IDE0046:Convert to conditional expression")]
-		protected internal virtual IEnumerable<string> GetFileSystemEntryPathsToDelete(string directoryPath, IEnumerable<string> pathToDeletePatterns)
+		protected internal virtual IEnumerable<string> GetFilePathsToDelete(string directoryPath, IEnumerable<string> pathToDeletePatterns)
 		{
-			var fileSystemEntryPathsToDelete = this.GetFileSystemEntryPathMatches("delete", directoryPath, pathToDeletePatterns).Select(match => this.FileSystem.Path.IsPathRooted(match) ? match : this.FileSystem.Path.Combine(directoryPath, match)).ToArray();
+			var filePathsToDelete = this.FindFiles("delete", directoryPath, pathToDeletePatterns).Select(match => this.FileSystem.Path.IsPathRooted(match) ? match : this.FileSystem.Path.Combine(directoryPath, match)).ToArray();
 
-			if(fileSystemEntryPathsToDelete.Any(path => this.PathsAreEqual(directoryPath, path)))
+			if(filePathsToDelete.Any(path => this.PathsAreEqual(directoryPath, path)))
 				throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "It is not allowed to delete the directory \"{0}\".", directoryPath));
 
-			return fileSystemEntryPathsToDelete;
+			return filePathsToDelete;
+		}
+
+		protected internal virtual IEnumerable<string> GetFilePathsToTransform(string directoryPath, IEnumerable<string> fileToTransformPatterns)
+		{
+			return this.FindFiles("transform", directoryPath, fileToTransformPatterns);
 		}
 
 		protected internal virtual string GetPathWithoutExtension(string path)
@@ -328,18 +327,18 @@ namespace RegionOrebroLan.Transforming
 			}
 		}
 
-		protected internal virtual void ValidateFileSystemEntryPathMatch(string action, string directoryPath, string fileSystemEntryPathMatch)
+		protected internal virtual void ValidateFilePath(string action, string directoryPath, string filePath)
 		{
-			if(string.IsNullOrWhiteSpace(fileSystemEntryPathMatch))
+			if(string.IsNullOrWhiteSpace(filePath))
 				return;
 
-			if(!this.FileSystem.Path.IsPathRooted(fileSystemEntryPathMatch))
+			if(!this.FileSystem.Path.IsPathRooted(filePath))
 				return;
 
 			// We are not allowed to delete files outside the directory-path.
 			// We can not transform files outside the directory-path because we can not resolve the destination for those files.
-			if(!new Uri(directoryPath).IsBaseOf(new Uri(fileSystemEntryPathMatch)))
-				throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "It is not allowed to {0} the file \"{1}\". The file is outside the directory-path \"{2}\".", action, fileSystemEntryPathMatch, directoryPath));
+			if(!new Uri(directoryPath).IsBaseOf(new Uri(filePath)))
+				throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "It is not allowed to {0} the file \"{1}\". The file is outside the directory-path \"{2}\".", action, filePath, directoryPath));
 		}
 
 		#endregion
