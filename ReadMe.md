@@ -48,6 +48,7 @@ For handling patterns the Microsoft.Extensions.FileSystemGlobbing.Matcher class 
 - pathToDeletePatterns
 
 Examples: https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.filesystemglobbing.matcher?view=dotnet-plat-ext-5.0#remarks
+
 NuGet: https://www.nuget.org/packages/Microsoft.Extensions.FileSystemGlobbing
 
 Patterns with absolute paths does not result in any matches.
