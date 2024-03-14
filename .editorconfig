@@ -17,7 +17,7 @@ indent_style = space
 
 [*.cs]
 # Set all, https://docs.microsoft.com/en-us/visualstudio/code-quality/use-roslyn-analyzers?view=vs-2019#set-rule-severity-of-multiple-analyzer-rules-at-once-in-an-editorconfig-file
-dotnet_analyzer_diagnostic.severity = none
+dotnet_analyzer_diagnostic.severity = error
 
 # Suppress (suppress any rule you need to suppress)
 dotnet_diagnostic.CA1860.severity = none
@@ -29,6 +29,13 @@ dotnet_diagnostic.IDE0055.severity = none
 dotnet_diagnostic.IDE0058.severity = none
 dotnet_diagnostic.IDE0063.severity = none
 dotnet_diagnostic.IDE0305.severity = none
+
+# Temporary
+dotnet_diagnostic.IDE0005.severity = none
+dotnet_diagnostic.IDE0074.severity = none
+dotnet_diagnostic.IDE0290.severity = none
+dotnet_diagnostic.IDE0300.severity = none
+dotnet_diagnostic.IDE0301.severity = none
 
 # Visual Studio
 csharp_space_after_keywords_in_control_flow_statements = false # Avoid space after if in if-statement. Eg. if() and not if ()
