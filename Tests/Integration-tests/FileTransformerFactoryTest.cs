@@ -1,4 +1,3 @@
-using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RegionOrebroLan.Transforming;
 using RegionOrebroLan.Transforming.IO;

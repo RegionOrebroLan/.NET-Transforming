@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace RegionOrebroLan.Transforming.Extensions
 {
 	public static class PackageTransformerExtension

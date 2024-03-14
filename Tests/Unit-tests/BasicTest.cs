@@ -1,5 +1,3 @@
-using System;
-
 namespace UnitTests
 {
 	public abstract class BasicTest

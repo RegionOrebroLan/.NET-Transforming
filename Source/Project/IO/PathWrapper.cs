@@ -1,5 +1,3 @@
-using System.IO;
-
 namespace RegionOrebroLan.Transforming.IO
 {
 	public class PathWrapper : IPath

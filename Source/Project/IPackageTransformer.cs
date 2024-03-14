@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace RegionOrebroLan.Transforming
 {
 	public interface IPackageTransformer

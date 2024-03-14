@@ -1,4 +1,3 @@
-using System;
 using RegionOrebroLan.Transforming.IO;
 using RegionOrebroLan.Transforming.IO.Extensions;
 
