@@ -2,7 +2,6 @@
 # Suppress
 dotnet_diagnostic.CA1307.severity = none
 dotnet_diagnostic.CA1707.severity = none
-#dotnet_diagnostic.CA2007.severity = none
 dotnet_diagnostic.CA5394.severity = none
 dotnet_diagnostic.IDE0074.severity = none
 dotnet_diagnostic.IDE0090.severity = none
