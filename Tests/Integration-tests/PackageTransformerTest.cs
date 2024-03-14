@@ -103,13 +103,13 @@ namespace IntegrationTests
 			var transformInformation = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames);
 			Assert.AreEqual(2, transformInformation.Count);
 			Assert.AreEqual(Path.Combine(directoryPath, "Web.config"), transformInformation.ElementAt(0).Key);
-			Assert.AreEqual(Path.Combine(directoryPath, @"Views\Web.config"), transformInformation.ElementAt(1).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "Views", "Web.config"), transformInformation.ElementAt(1).Key);
 
 			transformationNames = manyTransformationNames;
 			transformInformation = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames);
 			Assert.AreEqual(2, transformInformation.Count);
 			Assert.AreEqual(Path.Combine(directoryPath, "Web.config"), transformInformation.ElementAt(0).Key);
-			Assert.AreEqual(Path.Combine(directoryPath, @"Views\Web.config"), transformInformation.ElementAt(1).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "Views", "Web.config"), transformInformation.ElementAt(1).Key);
 
 			// Both back- and forward-slashes works.
 			fileToTransformPatterns = new[] { "**/*.config*", @"**\*.json", "**/*.xml" };
@@ -117,43 +117,43 @@ namespace IntegrationTests
 			transformInformation = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames);
 			Assert.AreEqual(6, transformInformation.Count);
 			Assert.AreEqual(Path.Combine(directoryPath, "Web.config"), transformInformation.ElementAt(0).Key);
-			Assert.AreEqual(Path.Combine(directoryPath, @"Views\Web.config"), transformInformation.ElementAt(1).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "Views", "Web.config"), transformInformation.ElementAt(1).Key);
 			Assert.AreEqual(Path.Combine(directoryPath, "AppSettings.json"), transformInformation.ElementAt(2).Key);
 			Assert.AreEqual(Path.Combine(directoryPath, "Settings.For.json"), transformInformation.ElementAt(3).Key);
-			Assert.AreEqual(Path.Combine(directoryPath, @"Directory\JSON-file.json"), transformInformation.ElementAt(4).Key);
-			Assert.AreEqual(Path.Combine(directoryPath, @"Directory\XML-file.xml"), transformInformation.ElementAt(5).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "Directory", "JSON-file.json"), transformInformation.ElementAt(4).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "Directory", "XML-file.xml"), transformInformation.ElementAt(5).Key);
 
 			transformationNames = manyTransformationNames;
 			transformInformation = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames);
 			Assert.AreEqual(6, transformInformation.Count);
 			Assert.AreEqual(Path.Combine(directoryPath, "Web.config"), transformInformation.ElementAt(0).Key);
-			Assert.AreEqual(Path.Combine(directoryPath, @"Views\Web.config"), transformInformation.ElementAt(1).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "Views", "Web.config"), transformInformation.ElementAt(1).Key);
 			Assert.AreEqual(Path.Combine(directoryPath, "AppSettings.json"), transformInformation.ElementAt(2).Key);
 			Assert.AreEqual(Path.Combine(directoryPath, "Settings.For.json"), transformInformation.ElementAt(3).Key);
-			Assert.AreEqual(Path.Combine(directoryPath, @"Directory\JSON-file.json"), transformInformation.ElementAt(4).Key);
-			Assert.AreEqual(Path.Combine(directoryPath, @"Directory\XML-file.xml"), transformInformation.ElementAt(5).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "Directory", "JSON-file.json"), transformInformation.ElementAt(4).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "Directory", "XML-file.xml"), transformInformation.ElementAt(5).Key);
 
 			// Both back- and forward-slashes works.
 			fileToTransformPatterns = new[] { @"**\*.xml", "**/*.json", @"**\*.config*" };
 			transformationNames = noTransformationNames;
 			transformInformation = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames);
 			Assert.AreEqual(6, transformInformation.Count);
-			Assert.AreEqual(Path.Combine(directoryPath, @"Directory\XML-file.xml"), transformInformation.ElementAt(0).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "Directory", "XML-file.xml"), transformInformation.ElementAt(0).Key);
 			Assert.AreEqual(Path.Combine(directoryPath, "AppSettings.json"), transformInformation.ElementAt(1).Key);
 			Assert.AreEqual(Path.Combine(directoryPath, "Settings.For.json"), transformInformation.ElementAt(2).Key);
-			Assert.AreEqual(Path.Combine(directoryPath, @"Directory\JSON-file.json"), transformInformation.ElementAt(3).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "Directory", "JSON-file.json"), transformInformation.ElementAt(3).Key);
 			Assert.AreEqual(Path.Combine(directoryPath, "Web.config"), transformInformation.ElementAt(4).Key);
-			Assert.AreEqual(Path.Combine(directoryPath, @"Views\Web.config"), transformInformation.ElementAt(5).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "Views", "Web.config"), transformInformation.ElementAt(5).Key);
 
 			transformationNames = manyTransformationNames;
 			transformInformation = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames);
 			Assert.AreEqual(6, transformInformation.Count);
-			Assert.AreEqual(Path.Combine(directoryPath, @"Directory\XML-file.xml"), transformInformation.ElementAt(0).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "Directory", "XML-file.xml"), transformInformation.ElementAt(0).Key);
 			Assert.AreEqual(Path.Combine(directoryPath, "AppSettings.json"), transformInformation.ElementAt(1).Key);
 			Assert.AreEqual(Path.Combine(directoryPath, "Settings.For.json"), transformInformation.ElementAt(2).Key);
-			Assert.AreEqual(Path.Combine(directoryPath, @"Directory\JSON-file.json"), transformInformation.ElementAt(3).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "Directory", "JSON-file.json"), transformInformation.ElementAt(3).Key);
 			Assert.AreEqual(Path.Combine(directoryPath, "Web.config"), transformInformation.ElementAt(4).Key);
-			Assert.AreEqual(Path.Combine(directoryPath, @"Views\Web.config"), transformInformation.ElementAt(5).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "Views", "Web.config"), transformInformation.ElementAt(5).Key);
 
 			directoryPath = this.GetTestResourcePath("My.Simple.Package");
 			fileToTransformPatterns = new[] { "**/*.config*" };
@@ -309,12 +309,12 @@ namespace IntegrationTests
 			Assert.AreEqual(Path.Combine(directoryPath, "Web.Release.config"), transformMap.ElementAt(0).Value.ElementAt(2));
 			Assert.AreEqual(Path.Combine(directoryPath, "Web.Test.config"), transformMap.ElementAt(0).Value.ElementAt(3));
 			Assert.AreEqual(Path.Combine(directoryPath, "Web.That-Should.Not-Be.Used.config"), transformMap.ElementAt(0).Value.ElementAt(4));
-			Assert.AreEqual(Path.Combine(directoryPath, @"Views\Web.config"), transformMap.ElementAt(1).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "Views", "Web.config"), transformMap.ElementAt(1).Key);
 			Assert.AreEqual(4, transformMap.ElementAt(1).Value.Count);
-			Assert.AreEqual(Path.Combine(directoryPath, @"Views\Web.1.2.3.4.5.config"), transformMap.ElementAt(1).Value.ElementAt(0));
-			Assert.AreEqual(Path.Combine(directoryPath, @"Views\Web.AB.CDE.FGHI.config"), transformMap.ElementAt(1).Value.ElementAt(1));
-			Assert.AreEqual(Path.Combine(directoryPath, @"Views\Web.Release.config"), transformMap.ElementAt(1).Value.ElementAt(2));
-			Assert.AreEqual(Path.Combine(directoryPath, @"Views\Web.Test.config"), transformMap.ElementAt(1).Value.ElementAt(3));
+			Assert.AreEqual(Path.Combine(directoryPath, "Views", "Web.1.2.3.4.5.config"), transformMap.ElementAt(1).Value.ElementAt(0));
+			Assert.AreEqual(Path.Combine(directoryPath, "Views", "Web.AB.CDE.FGHI.config"), transformMap.ElementAt(1).Value.ElementAt(1));
+			Assert.AreEqual(Path.Combine(directoryPath, "Views", "Web.Release.config"), transformMap.ElementAt(1).Value.ElementAt(2));
+			Assert.AreEqual(Path.Combine(directoryPath, "Views", "Web.Test.config"), transformMap.ElementAt(1).Value.ElementAt(3));
 
 			fileToTransformPatterns = new[] { "**/*.config*", "**/*.json", "**/*.xml" };
 			transformMap = this.PackageTransformer.GetTransformMap(directoryPath, fileToTransformPatterns);
@@ -326,12 +326,12 @@ namespace IntegrationTests
 			Assert.AreEqual(Path.Combine(directoryPath, "Web.Release.config"), transformMap.ElementAt(0).Value.ElementAt(2));
 			Assert.AreEqual(Path.Combine(directoryPath, "Web.Test.config"), transformMap.ElementAt(0).Value.ElementAt(3));
 			Assert.AreEqual(Path.Combine(directoryPath, "Web.That-Should.Not-Be.Used.config"), transformMap.ElementAt(0).Value.ElementAt(4));
-			Assert.AreEqual(Path.Combine(directoryPath, @"Views\Web.config"), transformMap.ElementAt(1).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "Views", "Web.config"), transformMap.ElementAt(1).Key);
 			Assert.AreEqual(4, transformMap.ElementAt(1).Value.Count);
-			Assert.AreEqual(Path.Combine(directoryPath, @"Views\Web.1.2.3.4.5.config"), transformMap.ElementAt(1).Value.ElementAt(0));
-			Assert.AreEqual(Path.Combine(directoryPath, @"Views\Web.AB.CDE.FGHI.config"), transformMap.ElementAt(1).Value.ElementAt(1));
-			Assert.AreEqual(Path.Combine(directoryPath, @"Views\Web.Release.config"), transformMap.ElementAt(1).Value.ElementAt(2));
-			Assert.AreEqual(Path.Combine(directoryPath, @"Views\Web.Test.config"), transformMap.ElementAt(1).Value.ElementAt(3));
+			Assert.AreEqual(Path.Combine(directoryPath, "Views", "Web.1.2.3.4.5.config"), transformMap.ElementAt(1).Value.ElementAt(0));
+			Assert.AreEqual(Path.Combine(directoryPath, "Views", "Web.AB.CDE.FGHI.config"), transformMap.ElementAt(1).Value.ElementAt(1));
+			Assert.AreEqual(Path.Combine(directoryPath, "Views", "Web.Release.config"), transformMap.ElementAt(1).Value.ElementAt(2));
+			Assert.AreEqual(Path.Combine(directoryPath, "Views", "Web.Test.config"), transformMap.ElementAt(1).Value.ElementAt(3));
 			Assert.AreEqual(Path.Combine(directoryPath, "AppSettings.json"), transformMap.ElementAt(2).Key);
 			Assert.AreEqual(4, transformMap.ElementAt(2).Value.Count);
 			Assert.AreEqual(Path.Combine(directoryPath, "AppSettings.1.2.3.4.5.json"), transformMap.ElementAt(2).Value.ElementAt(0));
@@ -344,13 +344,13 @@ namespace IntegrationTests
 			Assert.AreEqual(Path.Combine(directoryPath, "Settings.For.AB.CDE.FGHI.json"), transformMap.ElementAt(3).Value.ElementAt(1));
 			Assert.AreEqual(Path.Combine(directoryPath, "Settings.For.Release.json"), transformMap.ElementAt(3).Value.ElementAt(2));
 			Assert.AreEqual(Path.Combine(directoryPath, "Settings.For.Test.json"), transformMap.ElementAt(3).Value.ElementAt(3));
-			Assert.AreEqual(Path.Combine(directoryPath, @"Directory\JSON-file.json"), transformMap.ElementAt(4).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "Directory", "JSON-file.json"), transformMap.ElementAt(4).Key);
 			Assert.AreEqual(2, transformMap.ElementAt(4).Value.Count);
-			Assert.AreEqual(Path.Combine(directoryPath, @"Directory\JSON-file.Dummy.json"), transformMap.ElementAt(4).Value.ElementAt(0));
-			Assert.AreEqual(Path.Combine(directoryPath, @"Directory\JSON-file.Test.json"), transformMap.ElementAt(4).Value.ElementAt(1));
-			Assert.AreEqual(Path.Combine(directoryPath, @"Directory\XML-file.xml"), transformMap.ElementAt(5).Key);
+			Assert.AreEqual(Path.Combine(directoryPath, "Directory", "JSON-file.Dummy.json"), transformMap.ElementAt(4).Value.ElementAt(0));
+			Assert.AreEqual(Path.Combine(directoryPath, "Directory", "JSON-file.Test.json"), transformMap.ElementAt(4).Value.ElementAt(1));
+			Assert.AreEqual(Path.Combine(directoryPath, "Directory", "XML-file.xml"), transformMap.ElementAt(5).Key);
 			Assert.AreEqual(1, transformMap.ElementAt(5).Value.Count);
-			Assert.AreEqual(Path.Combine(directoryPath, @"Directory\XML-file.Release.xml"), transformMap.ElementAt(5).Value.ElementAt(0));
+			Assert.AreEqual(Path.Combine(directoryPath, "Directory", "XML-file.Release.xml"), transformMap.ElementAt(5).Value.ElementAt(0));
 
 			directoryPath = this.GetTestResourcePath("My.Simple.Package");
 			fileToTransformPatterns = new[] { "**/*.config*" };
