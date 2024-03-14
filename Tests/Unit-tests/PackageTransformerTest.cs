@@ -96,30 +96,30 @@ namespace UnitTests
 		}
 
 		[TestMethod]
-		public void ValidateFilePath_IfAllParametersAreNull_ShouldNotThrowAnExceptions()
+		public void ValidateFilePath_IfAllParametersAreNull_ShouldNotThrowAnException()
 		{
 			this.PackageTransformer.ValidateFilePath(null, null, null);
 		}
 
 		[TestMethod]
-		public void ValidateFilePath_IfTheFilePathParameterIsAnEmptyString_ShouldNotThrowAnExceptions()
+		public void ValidateFilePath_IfTheFilePathParameterIsAnEmptyString_ShouldNotThrowAnException()
 		{
-			this.ValidateFilePathShouldNotThrowAnExceptions(string.Empty);
+			this.ValidateFilePathShouldNotThrowAnException(string.Empty);
 		}
 
 		[TestMethod]
-		public void ValidateFilePath_IfTheFilePathParameterIsNull_ShouldNotThrowAnExceptions()
+		public void ValidateFilePath_IfTheFilePathParameterIsNull_ShouldNotThrowAnException()
 		{
-			this.ValidateFilePathShouldNotThrowAnExceptions(null);
+			this.ValidateFilePathShouldNotThrowAnException(null);
 		}
 
 		[TestMethod]
-		public void ValidateFilePath_IfTheFilePathParameterIsOnlyWhitespaces_ShouldNotThrowAnExceptions()
+		public void ValidateFilePath_IfTheFilePathParameterIsOnlyWhitespaces_ShouldNotThrowAnException()
 		{
-			this.ValidateFilePathShouldNotThrowAnExceptions("    ");
+			this.ValidateFilePathShouldNotThrowAnException("    ");
 		}
 
-		protected internal virtual void ValidateFilePathShouldNotThrowAnExceptions(string filePath)
+		protected internal virtual void ValidateFilePathShouldNotThrowAnException(string filePath)
 		{
 			this.PackageTransformer.ValidateFilePath(null, null, filePath);
 			this.PackageTransformer.ValidateFilePath(null, string.Empty, filePath);

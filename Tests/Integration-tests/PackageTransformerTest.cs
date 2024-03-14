@@ -737,18 +737,18 @@ namespace IntegrationTests
 		}
 
 		[TestMethod]
-		public void ValidateFilePath_IfTheFilePathParameterIsARelativePath_ShouldNotThrowAnExceptions()
+		public void ValidateFilePath_IfTheFilePathParameterIsARelativePath_ShouldNotThrowAnException()
 		{
-			this.ValidateFilePathShouldNotThrowAnExceptions("Text.txt");
-			this.ValidateFilePathShouldNotThrowAnExceptions("/Text.txt");
-			this.ValidateFilePathShouldNotThrowAnExceptions(@"\Text.txt");
-			this.ValidateFilePathShouldNotThrowAnExceptions("Directory/Text.txt");
-			this.ValidateFilePathShouldNotThrowAnExceptions(@"Directory\Text.txt");
-			this.ValidateFilePathShouldNotThrowAnExceptions("/Directory/Text.txt");
-			this.ValidateFilePathShouldNotThrowAnExceptions(@"\Directory\Text.txt");
+			this.ValidateFilePathShouldNotThrowAnException("Text.txt");
+			this.ValidateFilePathShouldNotThrowAnException("/Text.txt");
+			this.ValidateFilePathShouldNotThrowAnException(@"\Text.txt");
+			this.ValidateFilePathShouldNotThrowAnException("Directory/Text.txt");
+			this.ValidateFilePathShouldNotThrowAnException(@"Directory\Text.txt");
+			this.ValidateFilePathShouldNotThrowAnException("/Directory/Text.txt");
+			this.ValidateFilePathShouldNotThrowAnException(@"\Directory\Text.txt");
 		}
 
-		protected internal virtual void ValidateFilePathShouldNotThrowAnExceptions(string filePath)
+		protected internal virtual void ValidateFilePathShouldNotThrowAnException(string filePath)
 		{
 			this.PackageTransformer.ValidateFilePath("Test", @"C:\Some-directory", filePath);
 		}
