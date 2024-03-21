@@ -3,6 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34701.34
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{5C1DEFC8-6A9B-405B-95B5-14F4FC9C4B6D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{95CA0B56-C465-4DCF-ACC6-B7B136EB2FFC}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\Build-and-test.yml = .github\workflows\Build-and-test.yml
+	EndProjectSection
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".root", ".root", "{FB1FE6E7-F626-4740-9996-73BBCDB5CC2C}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
@@ -56,6 +63,7 @@ Global
 		{A5434081-87FA-44A5-846C-1814628DDBC2} = {87A3062B-04F2-499E-BB7C-77A5FF39FF1B}
 		{8255B796-2C4B-477A-B14D-10AB830DF051} = {83613992-9741-4479-A247-4427759F91AE}
 		{48E195C1-62D0-4805-AEA9-9C744446C653} = {83613992-9741-4479-A247-4427759F91AE}
+		{95CA0B56-C465-4DCF-ACC6-B7B136EB2FFC} = {5C1DEFC8-6A9B-405B-95B5-14F4FC9C4B6D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CEFB899D-853C-4336-8F00-AFCC15228D63}
