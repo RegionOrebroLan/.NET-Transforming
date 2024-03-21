@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RegionOrebroLan.Transforming;
 using RegionOrebroLan.Transforming.IO;
@@ -16,7 +17,7 @@ namespace IntegrationTests
 
 		#region Properties
 
-		protected internal virtual XmlTransformer XmlTransformer => _xmlTransformer ??= new XmlTransformer(new FileSystem(), new Platform());
+		protected internal virtual XmlTransformer XmlTransformer => _xmlTransformer ??= new XmlTransformer(new FileSystem(), new NullLoggerFactory(), new Platform());
 
 		#endregion
 

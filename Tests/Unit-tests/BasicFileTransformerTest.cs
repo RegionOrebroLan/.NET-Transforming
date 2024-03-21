@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using RegionOrebroLan.Transforming;
@@ -42,7 +43,7 @@ namespace UnitTests
 			var platformMock = new Mock<IPlatform>();
 			platformMock.Setup(runtime => runtime.IsWindows).Returns(isWindows);
 
-			return new Mock<BasicFileTransformer>(fileSystemMock.Object, platformMock.Object) { CallBase = true }.Object;
+			return new Mock<BasicFileTransformer>(fileSystemMock.Object, Mock.Of<ILoggerFactory>(), platformMock.Object) { CallBase = true }.Object;
 		}
 
 		[TestMethod]

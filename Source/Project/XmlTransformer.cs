@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Microsoft.Web.XmlTransform;
 using RegionOrebroLan.Transforming.IO;
 using RegionOrebroLan.Transforming.IO.Extensions;
@@ -6,7 +7,7 @@ using RegionOrebroLan.Transforming.Text.Extensions;
 
 namespace RegionOrebroLan.Transforming
 {
-	public class XmlTransformer(IFileSystem fileSystem, IPlatform platform) : BasicFileTransformer(fileSystem, platform)
+	public class XmlTransformer(IFileSystem fileSystem, ILoggerFactory loggerFactory, IPlatform platform) : BasicFileTransformer(fileSystem, loggerFactory, platform)
 	{
 		#region Methods
 

@@ -13,8 +13,8 @@ Library for json-, package- and xml-transformation. The package-transformer can 
 	var source = @"C:\Data\Transforming\Sources\AppSettings.json";
 	var transformation = @"C:\Data\Transforming\Sources\AppSettings.Release.json";
 
-	// You can register IFileSystem, IFileTransformerFactory and IPlatform in your preferred IoC container.
-	var fileTransformerFactory = new FileTransformerFactory(new FileSystem(), new Platform());
+	// You can register IFileSystem, IFileTransformerFactory, ILoggerFactory and IPlatform in your preferred IoC container.
+	var fileTransformerFactory = new FileTransformerFactory(new FileSystem(), new NullLoggerFactory(), new Platform());
 
 	fileTransformerFactory.Create(source).Transform(destination, source, transformation);
 
@@ -24,8 +24,8 @@ Library for json-, package- and xml-transformation. The package-transformer can 
 	var source = @"C:\Data\Transforming\Sources\Web.config";
 	var transformation = @"C:\Data\Transforming\Sources\Web.Release.config";
 
-	// You can register IFileSystem, IFileTransformerFactory and IPlatform in your preferred IoC container.
-	var fileTransformerFactory = new FileTransformerFactory(new FileSystem(), new Platform());
+	// You can register IFileSystem, IFileTransformerFactory, ILoggerFactory and IPlatform in your preferred IoC container.
+	var fileTransformerFactory = new FileTransformerFactory(new FileSystem(), new NullLoggerFactory(), new Platform());
 
 	fileTransformerFactory.Create(source).Transform(destination, source, transformation);
 
@@ -35,9 +35,10 @@ Library for json-, package- and xml-transformation. The package-transformer can 
 
 First you set the parameters, see the different examples below. Then:
 
-	// You can register IFileSearcher, IFileSystem, IFileTransformerFactory, IPackageHandlerLoader and IPlatform in your preferred IoC container.
+	// You can register IFileSearcher, IFileSystem, IFileTransformerFactory, ILoggerFactory, IPackageHandlerLoader and IPlatform in your preferred IoC container.
 	var fileSystem = new FileSystem();
-	var packageTransformer = new PackageTransformer(new FileMatcher(), fileSystem, new FileTransformerFactory(fileSystem, new Platform()), new PackageHandlerLoader(fileSystem));
+	var loggerFactory = new NullLoggerFactory();
+	var packageTransformer = new PackageTransformer(new FileMatcher(), fileSystem, new FileTransformerFactory(fileSystem, loggerFactory, new Platform()), loggerFactory, new PackageHandlerLoader(fileSystem));
 
 	// The actual transforming is done under the %temp%-directory. The cleanup-parameter (the first boolean parameter) is for removing the temporary transform-directories or not.
 	packageTransformer.Transform(true, destination, fileToTransformPatterns, pathToDeletePatterns, source, transformationNames);

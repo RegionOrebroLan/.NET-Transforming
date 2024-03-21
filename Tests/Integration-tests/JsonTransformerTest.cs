@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RegionOrebroLan.Transforming;
 using RegionOrebroLan.Transforming.IO;
@@ -16,7 +17,7 @@ namespace IntegrationTests
 
 		#region Properties
 
-		protected internal virtual JsonTransformer JsonTransformer => _jsonTransformer ??= new JsonTransformer(new FileSystem(), new Platform());
+		protected internal virtual JsonTransformer JsonTransformer => _jsonTransformer ??= new JsonTransformer(new FileSystem(), new NullLoggerFactory(), new Platform());
 
 		#endregion
 

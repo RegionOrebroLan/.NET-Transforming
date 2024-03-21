@@ -1,11 +1,11 @@
 using System.Globalization;
+using Microsoft.Extensions.Logging;
 using RegionOrebroLan.Transforming.IO;
 using RegionOrebroLan.Transforming.IO.Extensions;
 
 namespace RegionOrebroLan.Transforming
 {
-	public class PackageTransformer(IFileSearcher fileSearcher, IFileSystem fileSystem, IFileTransformerFactory fileTransformerFactory, IPackageHandlerLoader packageHandlerLoader)
-		: IPackageTransformer
+	public class PackageTransformer : IPackageTransformer
 	{
 		#region Fields
 
@@ -13,12 +13,26 @@ namespace RegionOrebroLan.Transforming
 
 		#endregion
 
+		#region Constructors
+
+		public PackageTransformer(IFileSearcher fileSearcher, IFileSystem fileSystem, IFileTransformerFactory fileTransformerFactory, ILoggerFactory loggerFactory, IPackageHandlerLoader packageHandlerLoader)
+		{
+			this.FileSearcher = fileSearcher ?? throw new ArgumentNullException(nameof(fileSearcher));
+			this.FileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+			this.FileTransformerFactory = fileTransformerFactory ?? throw new ArgumentNullException(nameof(fileTransformerFactory));
+			this.Logger = (loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory))).CreateLogger(this.GetType());
+			this.PackageHandlerLoader = packageHandlerLoader ?? throw new ArgumentNullException(nameof(packageHandlerLoader));
+		}
+
+		#endregion
+
 		#region Properties
 
-		protected internal virtual IFileSearcher FileSearcher { get; } = fileSearcher ?? throw new ArgumentNullException(nameof(fileSearcher));
-		protected internal virtual IFileSystem FileSystem { get; } = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
-		protected internal virtual IFileTransformerFactory FileTransformerFactory { get; } = fileTransformerFactory ?? throw new ArgumentNullException(nameof(fileTransformerFactory));
-		protected internal virtual IPackageHandlerLoader PackageHandlerLoader { get; } = packageHandlerLoader ?? throw new ArgumentNullException(nameof(packageHandlerLoader));
+		protected internal virtual IFileSearcher FileSearcher { get; }
+		protected internal virtual IFileSystem FileSystem { get; }
+		protected internal virtual IFileTransformerFactory FileTransformerFactory { get; }
+		protected internal virtual ILogger Logger { get; }
+		protected internal virtual IPackageHandlerLoader PackageHandlerLoader { get; }
 		protected internal virtual IEnumerable<char> PathPatternSeparators => _pathPatternSeparators;
 
 		#endregion

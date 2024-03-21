@@ -1,16 +1,31 @@
 using System.Globalization;
 using System.Xml;
+using Microsoft.Extensions.Logging;
 using RegionOrebroLan.Transforming.IO;
 using RegionOrebroLan.Transforming.Runtime;
 
 namespace RegionOrebroLan.Transforming
 {
-	public class FileTransformerFactory(IFileSystem fileSystem, IPlatform platform) : IFileTransformerFactory
+	public class FileTransformerFactory : IFileTransformerFactory
 	{
+		#region Constructors
+
+		public FileTransformerFactory(IFileSystem fileSystem, ILoggerFactory loggerFactory, IPlatform platform)
+		{
+			this.FileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+			this.LoggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
+			this.Logger = loggerFactory.CreateLogger(this.GetType());
+			this.Platform = platform ?? throw new ArgumentNullException(nameof(platform));
+		}
+
+		#endregion
+
 		#region Properties
 
-		protected internal virtual IFileSystem FileSystem { get; } = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
-		protected internal virtual IPlatform Platform { get; } = platform ?? throw new ArgumentNullException(nameof(platform));
+		protected internal virtual IFileSystem FileSystem { get; }
+		protected internal virtual ILogger Logger { get; }
+		protected internal virtual ILoggerFactory LoggerFactory { get; }
+		protected internal virtual IPlatform Platform { get; }
 
 		#endregion
 
@@ -28,10 +43,10 @@ namespace RegionOrebroLan.Transforming
 				throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "The source \"{0}\" does not exist.", source), nameof(source));
 
 			if(this.IsJsonFile(source))
-				return new JsonTransformer(this.FileSystem, this.Platform);
+				return new JsonTransformer(this.FileSystem, this.LoggerFactory, this.Platform);
 
 			if(this.IsXmlFile(source))
-				return new XmlTransformer(this.FileSystem, this.Platform);
+				return new XmlTransformer(this.FileSystem, this.LoggerFactory, this.Platform);
 
 			throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "A transformer for file \"{0}\" could not be created.", source));
 		}

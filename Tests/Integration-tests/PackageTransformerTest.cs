@@ -1,5 +1,6 @@
 using System.IO.Compression;
 using IntegrationTests.Helpers;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RegionOrebroLan.Transforming;
 using RegionOrebroLan.Transforming.IO;
@@ -26,8 +27,9 @@ namespace IntegrationTests
 				if(_packageTransformer == null)
 				{
 					var fileSystem = new FileSystem();
+					var loggerFactory = new NullLoggerFactory();
 
-					_packageTransformer = new PackageTransformer(new FileSearcher(), fileSystem, new FileTransformerFactory(fileSystem, new Platform()), new PackageHandlerLoader(fileSystem));
+					_packageTransformer = new PackageTransformer(new FileSearcher(), fileSystem, new FileTransformerFactory(fileSystem, loggerFactory, new Platform()), loggerFactory, new PackageHandlerLoader(fileSystem));
 				}
 				// ReSharper restore InvertIf
 

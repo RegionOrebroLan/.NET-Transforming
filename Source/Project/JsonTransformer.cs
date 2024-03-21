@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.Jdt;
 using RegionOrebroLan.Transforming.IO;
 using RegionOrebroLan.Transforming.IO.Extensions;
@@ -6,7 +7,7 @@ using RegionOrebroLan.Transforming.Text.Extensions;
 
 namespace RegionOrebroLan.Transforming
 {
-	public class JsonTransformer(IFileSystem fileSystem, IPlatform platform) : BasicFileTransformer(fileSystem, platform)
+	public class JsonTransformer(IFileSystem fileSystem, ILoggerFactory loggerFactory, IPlatform platform) : BasicFileTransformer(fileSystem, loggerFactory, platform)
 	{
 		#region Methods
 

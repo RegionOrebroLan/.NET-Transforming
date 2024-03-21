@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using RegionOrebroLan.Transforming;
@@ -34,7 +35,7 @@ namespace UnitTests
 					fileSystemMock.Setup(fileSystem => fileSystem.Directory).Returns(directoryMock.Object);
 					fileSystemMock.Setup(fileSystem => fileSystem.File).Returns(fileMock.Object);
 
-					_packageTransformer = new PackageTransformer(Mock.Of<IFileSearcher>(), fileSystemMock.Object, Mock.Of<IFileTransformerFactory>(), Mock.Of<IPackageHandlerLoader>());
+					_packageTransformer = new PackageTransformer(Mock.Of<IFileSearcher>(), fileSystemMock.Object, Mock.Of<IFileTransformerFactory>(), Mock.Of<ILoggerFactory>(), Mock.Of<IPackageHandlerLoader>());
 				}
 				// ReSharper restore InvertIf
 
