@@ -113,7 +113,7 @@ namespace IntegrationTests
 			Assert.AreEqual(Path.Combine(directoryPath, "Views", "Web.config"), transformInformation.ElementAt(1).Key);
 
 			// Both back- and forward-slashes works.
-			fileToTransformPatterns = new[] { "**/*.config*", @"**\*.json", "**/*.xml" };
+			fileToTransformPatterns = ["**/*.config*", @"**\*.json", "**/*.xml"];
 			transformationNames = noTransformationNames;
 			transformInformation = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames);
 			Assert.AreEqual(6, transformInformation.Count);
@@ -135,7 +135,7 @@ namespace IntegrationTests
 			Assert.AreEqual(Path.Combine(directoryPath, "Directory", "XML-file.xml"), transformInformation.ElementAt(5).Key);
 
 			// Both back- and forward-slashes works.
-			fileToTransformPatterns = new[] { @"**\*.xml", "**/*.json", @"**\*.config*" };
+			fileToTransformPatterns = [@"**\*.xml", "**/*.json", @"**\*.config*"];
 			transformationNames = noTransformationNames;
 			transformInformation = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames);
 			Assert.AreEqual(6, transformInformation.Count);
@@ -157,7 +157,7 @@ namespace IntegrationTests
 			Assert.AreEqual(Path.Combine(directoryPath, "Views", "Web.config"), transformInformation.ElementAt(5).Key);
 
 			directoryPath = this.GetTestResourcePath("My.Simple.Package");
-			fileToTransformPatterns = new[] { "**/*.config*" };
+			fileToTransformPatterns = ["**/*.config*"];
 			transformationNames = noTransformationNames;
 			transformInformation = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames);
 			Assert.AreEqual(2, transformInformation.Count);
@@ -170,13 +170,13 @@ namespace IntegrationTests
 			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.config"), transformInformation.ElementAt(0).Key);
 			Assert.AreEqual(Path.Combine(directoryPath, "Web.config"), transformInformation.ElementAt(1).Key);
 
-			transformationNames = new[] { "4.5" };
+			transformationNames = ["4.5"];
 			transformInformation = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames);
 			Assert.AreEqual(2, transformInformation.Count);
 			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.config"), transformInformation.ElementAt(0).Key);
 			Assert.AreEqual(Path.Combine(directoryPath, "Web.config"), transformInformation.ElementAt(1).Key);
 
-			fileToTransformPatterns = new[] { "**/*.config*", "**/*.json", "**/*.xml" };
+			fileToTransformPatterns = ["**/*.config*", "**/*.json", "**/*.xml"];
 			transformationNames = noTransformationNames;
 			transformInformation = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames);
 			Assert.AreEqual(2, transformInformation.Count);
@@ -189,7 +189,7 @@ namespace IntegrationTests
 			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.config"), transformInformation.ElementAt(0).Key);
 			Assert.AreEqual(Path.Combine(directoryPath, "Web.config"), transformInformation.ElementAt(1).Key);
 
-			fileToTransformPatterns = new[] { "**/*.config*" };
+			fileToTransformPatterns = ["**/*.config*"];
 			transformationNames = manyTransformationNames;
 			var transformEntries = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames).ElementAt(0).Value;
 			Assert.AreEqual(1, transformEntries.Count);
@@ -232,7 +232,7 @@ namespace IntegrationTests
 			Assert.AreEqual(Path.Combine(directoryPath, "Web.That-Should.Not-Be.Used.config"), transformEntries.ElementAt(5).Key);
 			Assert.IsFalse(transformEntries.ElementAt(5).Value);
 
-			transformationNames = new[] { "4.5" };
+			transformationNames = ["4.5"];
 			transformEntries = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames).ElementAt(0).Value;
 			Assert.AreEqual(1, transformEntries.Count);
 			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.4.5.config"), transformEntries.ElementAt(0).Key);
@@ -253,7 +253,7 @@ namespace IntegrationTests
 			Assert.AreEqual(Path.Combine(directoryPath, "Web.That-Should.Not-Be.Used.config"), transformEntries.ElementAt(5).Key);
 			Assert.IsFalse(transformEntries.ElementAt(5).Value);
 
-			transformationNames = new[] { "Test" };
+			transformationNames = ["Test"];
 			transformEntries = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames).ElementAt(0).Value;
 			Assert.AreEqual(1, transformEntries.Count);
 			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.4.5.config"), transformEntries.ElementAt(0).Key);
@@ -274,7 +274,7 @@ namespace IntegrationTests
 			Assert.AreEqual(Path.Combine(directoryPath, "Web.That-Should.Not-Be.Used.config"), transformEntries.ElementAt(5).Key);
 			Assert.IsFalse(transformEntries.ElementAt(5).Value);
 
-			transformationNames = new[] { "Test", "AB.CDE.FGHI" };
+			transformationNames = ["Test", "AB.CDE.FGHI"];
 			transformEntries = this.PackageTransformer.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames).ElementAt(0).Value;
 			Assert.AreEqual(1, transformEntries.Count);
 			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.4.5.config"), transformEntries.ElementAt(0).Key);
@@ -317,7 +317,7 @@ namespace IntegrationTests
 			Assert.AreEqual(Path.Combine(directoryPath, "Views", "Web.Release.config"), transformMap.ElementAt(1).Value.ElementAt(2));
 			Assert.AreEqual(Path.Combine(directoryPath, "Views", "Web.Test.config"), transformMap.ElementAt(1).Value.ElementAt(3));
 
-			fileToTransformPatterns = new[] { "**/*.config*", "**/*.json", "**/*.xml" };
+			fileToTransformPatterns = ["**/*.config*", "**/*.json", "**/*.xml"];
 			transformMap = this.PackageTransformer.GetTransformMap(directoryPath, fileToTransformPatterns);
 			Assert.AreEqual(6, transformMap.Count);
 			Assert.AreEqual(Path.Combine(directoryPath, "Web.config"), transformMap.ElementAt(0).Key);
@@ -354,7 +354,7 @@ namespace IntegrationTests
 			Assert.AreEqual(Path.Combine(directoryPath, "Directory", "XML-file.Release.xml"), transformMap.ElementAt(5).Value.ElementAt(0));
 
 			directoryPath = this.GetTestResourcePath("My.Simple.Package");
-			fileToTransformPatterns = new[] { "**/*.config*" };
+			fileToTransformPatterns = ["**/*.config*"];
 			transformMap = this.PackageTransformer.GetTransformMap(directoryPath, fileToTransformPatterns);
 			Assert.AreEqual(2, transformMap.Count);
 			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.config"), transformMap.ElementAt(0).Key);
@@ -369,7 +369,7 @@ namespace IntegrationTests
 			Assert.AreEqual(Path.Combine(directoryPath, "Web.Test.config"), transformMap.ElementAt(1).Value.ElementAt(4));
 			Assert.AreEqual(Path.Combine(directoryPath, "Web.That-Should.Not-Be.Used.config"), transformMap.ElementAt(1).Value.ElementAt(5));
 
-			fileToTransformPatterns = new[] { "**/*.config*", "**/*.json", "**/*.xml" };
+			fileToTransformPatterns = ["**/*.config*", "**/*.json", "**/*.xml"];
 			transformMap = this.PackageTransformer.GetTransformMap(directoryPath, fileToTransformPatterns);
 			Assert.AreEqual(2, transformMap.Count);
 			Assert.AreEqual(Path.Combine(directoryPath, "Web.1.2.3.config"), transformMap.ElementAt(0).Key);

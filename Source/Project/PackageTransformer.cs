@@ -9,7 +9,7 @@ namespace RegionOrebroLan.Transforming
 	{
 		#region Fields
 
-		private static readonly IEnumerable<char> _pathPatternSeparators = new[] { ';' };
+		private static readonly IEnumerable<char> _pathPatternSeparators = [';'];
 
 		#endregion
 
@@ -62,7 +62,7 @@ namespace RegionOrebroLan.Transforming
 
 		protected internal virtual IEnumerable<string> FindFiles(string directoryPath, string includePattern)
 		{
-			return this.FileSearcher.Find(directoryPath, null, new[] { includePattern }).Select(filePath => filePath.Replace(this.FileSystem.Path.AltDirectorySeparatorChar, this.FileSystem.Path.DirectorySeparatorChar));
+			return this.FileSearcher.Find(directoryPath, null, [includePattern]).Select(filePath => filePath.Replace(this.FileSystem.Path.AltDirectorySeparatorChar, this.FileSystem.Path.DirectorySeparatorChar));
 		}
 
 		protected internal virtual IEnumerable<string> FindFiles(string action, string directoryPath, IEnumerable<string> includePatterns)

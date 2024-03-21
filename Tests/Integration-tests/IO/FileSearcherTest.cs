@@ -28,14 +28,14 @@ namespace IntegrationTests.IO
 			const int numberOfFiles = 22;
 
 			const string includePattern = "**/*";
-			Assert.AreEqual(numberOfFiles, fileSearcher.Find(directoryPath, null, new[] { includePattern }).Count());
+			Assert.AreEqual(numberOfFiles, fileSearcher.Find(directoryPath, null, [includePattern]).Count());
 
 			const string relativeExcludePattern = "Web.config";
-			Assert.AreEqual(numberOfFiles - 1, fileSearcher.Find(directoryPath, new[] { relativeExcludePattern }, new[] { includePattern }).Count());
+			Assert.AreEqual(numberOfFiles - 1, fileSearcher.Find(directoryPath, [relativeExcludePattern], [includePattern]).Count());
 
 			var absoluteExcludePattern = Path.Combine(directoryPath, "Web.config");
 			Assert.IsTrue(File.Exists(absoluteExcludePattern));
-			Assert.AreEqual(numberOfFiles, fileSearcher.Find(directoryPath, new[] { absoluteExcludePattern }, new[] { includePattern }).Count());
+			Assert.AreEqual(numberOfFiles, fileSearcher.Find(directoryPath, [absoluteExcludePattern], [includePattern]).Count());
 		}
 
 		[TestMethod]
@@ -44,46 +44,46 @@ namespace IntegrationTests.IO
 			var directoryPath = Path.Combine(this.TestResourceDirectory.FullName, "Package");
 			var fileSearcher = new FileSearcher();
 
-			var filePaths = fileSearcher.Find(directoryPath, null, new[] { "Directory-To-Delete" }).ToArray();
+			var filePaths = fileSearcher.Find(directoryPath, null, ["Directory-To-Delete"]).ToArray();
 			Assert.IsFalse(filePaths.Any());
 
-			filePaths = fileSearcher.Find(directoryPath, null, new[] { "/Directory-To-Delete" }).ToArray();
+			filePaths = fileSearcher.Find(directoryPath, null, ["/Directory-To-Delete"]).ToArray();
 			Assert.IsFalse(filePaths.Any());
 
-			filePaths = fileSearcher.Find(directoryPath, null, new[] { "Directory-To-Delete/**" }).ToArray();
+			filePaths = fileSearcher.Find(directoryPath, null, ["Directory-To-Delete/**"]).ToArray();
 			Assert.IsFalse(filePaths.Any());
 
-			filePaths = fileSearcher.Find(directoryPath, null, new[] { "/Directory-To-Delete/**" }).ToArray();
+			filePaths = fileSearcher.Find(directoryPath, null, ["/Directory-To-Delete/**"]).ToArray();
 			Assert.IsFalse(filePaths.Any());
 
-			filePaths = fileSearcher.Find(directoryPath, null, new[] { "Directory-To-Delete/**/*" }).ToArray();
+			filePaths = fileSearcher.Find(directoryPath, null, ["Directory-To-Delete/**/*"]).ToArray();
 			Assert.IsFalse(filePaths.Any());
 
-			filePaths = fileSearcher.Find(directoryPath, null, new[] { "/Directory-To-Delete/**/*" }).ToArray();
+			filePaths = fileSearcher.Find(directoryPath, null, ["/Directory-To-Delete/**/*"]).ToArray();
 			Assert.IsFalse(filePaths.Any());
 
-			filePaths = fileSearcher.Find(directoryPath, null, new[] { "**/Directory-To-Delete" }).ToArray();
+			filePaths = fileSearcher.Find(directoryPath, null, ["**/Directory-To-Delete"]).ToArray();
 			Assert.IsFalse(filePaths.Any());
 
-			filePaths = fileSearcher.Find(directoryPath, null, new[] { "/**/Directory-To-Delete" }).ToArray();
+			filePaths = fileSearcher.Find(directoryPath, null, ["/**/Directory-To-Delete"]).ToArray();
 			Assert.IsFalse(filePaths.Any());
 
-			filePaths = fileSearcher.Find(directoryPath, null, new[] { "**/Directory-To-Delete/**" }).ToArray();
+			filePaths = fileSearcher.Find(directoryPath, null, ["**/Directory-To-Delete/**"]).ToArray();
 			Assert.AreEqual(2, filePaths.Length);
 			Assert.AreEqual("Directory/Directory-To-Delete/File-To-Delete-1.txt", filePaths[0]);
 			Assert.AreEqual("Directory/Directory-To-Delete/File-To-Delete-2.txt", filePaths[1]);
 
-			filePaths = fileSearcher.Find(directoryPath, null, new[] { "/**/Directory-To-Delete/**" }).ToArray();
+			filePaths = fileSearcher.Find(directoryPath, null, ["/**/Directory-To-Delete/**"]).ToArray();
 			Assert.AreEqual(2, filePaths.Length);
 			Assert.AreEqual("Directory/Directory-To-Delete/File-To-Delete-1.txt", filePaths[0]);
 			Assert.AreEqual("Directory/Directory-To-Delete/File-To-Delete-2.txt", filePaths[1]);
 
-			filePaths = fileSearcher.Find(directoryPath, null, new[] { "**/Directory-To-Delete/**/*" }).ToArray();
+			filePaths = fileSearcher.Find(directoryPath, null, ["**/Directory-To-Delete/**/*"]).ToArray();
 			Assert.AreEqual(2, filePaths.Length);
 			Assert.AreEqual("Directory/Directory-To-Delete/File-To-Delete-1.txt", filePaths[0]);
 			Assert.AreEqual("Directory/Directory-To-Delete/File-To-Delete-2.txt", filePaths[1]);
 
-			filePaths = fileSearcher.Find(directoryPath, null, new[] { "/**/Directory-To-Delete/**/*" }).ToArray();
+			filePaths = fileSearcher.Find(directoryPath, null, ["/**/Directory-To-Delete/**/*"]).ToArray();
 			Assert.AreEqual(2, filePaths.Length);
 			Assert.AreEqual("Directory/Directory-To-Delete/File-To-Delete-1.txt", filePaths[0]);
 			Assert.AreEqual("Directory/Directory-To-Delete/File-To-Delete-2.txt", filePaths[1]);
@@ -97,10 +97,10 @@ namespace IntegrationTests.IO
 
 			var includePattern = Path.Combine(directoryPath, "Web.config");
 			Assert.IsTrue(File.Exists(includePattern));
-			Assert.IsFalse(fileSearcher.Find(directoryPath, null, new[] { includePattern }).Any());
+			Assert.IsFalse(fileSearcher.Find(directoryPath, null, [includePattern]).Any());
 
 			includePattern = @"C:\Some-directory\Some-file.txt";
-			Assert.IsFalse(fileSearcher.Find(directoryPath, null, new[] { includePattern }).Any());
+			Assert.IsFalse(fileSearcher.Find(directoryPath, null, [includePattern]).Any());
 		}
 
 		#endregion
