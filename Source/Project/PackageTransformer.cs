@@ -102,7 +102,7 @@ namespace RegionOrebroLan.Transforming
 
 		protected internal virtual IEnumerable<string> FindFiles(string action, string directoryPath, IEnumerable<string> includePatterns, bool validate)
 		{
-			return (includePatterns ?? Enumerable.Empty<string>()).SelectMany(item => this.FindFiles(action, directoryPath, item, validate));
+			return (includePatterns ?? []).SelectMany(item => this.FindFiles(action, directoryPath, item, validate));
 		}
 
 		protected internal virtual IEnumerable<string> GetFilePathsToDelete(string directoryPath, IEnumerable<string> pathToDeletePatterns)
@@ -152,7 +152,7 @@ namespace RegionOrebroLan.Transforming
 
 		protected internal virtual IDictionary<string, IDictionary<string, bool>> GetTransformInformation(string directoryPath, IEnumerable<string> fileToTransformPatterns, IEnumerable<string> transformationNames)
 		{
-			transformationNames = (transformationNames ?? Enumerable.Empty<string>()).ToArray();
+			transformationNames = (transformationNames ?? []).ToArray();
 			var stringComparer = StringComparer.OrdinalIgnoreCase;
 			var transformInformation = new Dictionary<string, IDictionary<string, bool>>(stringComparer);
 

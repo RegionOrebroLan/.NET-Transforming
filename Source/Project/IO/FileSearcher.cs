@@ -11,8 +11,8 @@ namespace RegionOrebroLan.Transforming.IO
 		{
 			var matcher = new Matcher();
 
-			matcher.AddExcludePatterns(excludePatterns ?? Enumerable.Empty<string>());
-			matcher.AddIncludePatterns(includePatterns ?? Enumerable.Empty<string>());
+			matcher.AddExcludePatterns(excludePatterns ?? []);
+			matcher.AddIncludePatterns(includePatterns ?? []);
 
 			return matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(directoryPath))).Files.Select(file => file.Path);
 		}
