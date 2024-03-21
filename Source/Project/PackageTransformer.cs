@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using RegionOrebroLan.Transforming.IO;
 using RegionOrebroLan.Transforming.IO.Extensions;
@@ -117,7 +116,6 @@ namespace RegionOrebroLan.Transforming
 			return (includePatterns ?? Enumerable.Empty<string>()).SelectMany(item => this.FindFiles(action, directoryPath, item, validate));
 		}
 
-		[SuppressMessage("Style", "IDE0046:Convert to conditional expression")]
 		protected internal virtual IEnumerable<string> GetFilePathsToDelete(string directoryPath, IEnumerable<string> pathToDeletePatterns)
 		{
 			var filePathsToDelete = this.FindFiles("delete", directoryPath, pathToDeletePatterns).Select(match => this.FileSystem.Path.IsPathRooted(match) ? match : this.FileSystem.Path.Combine(directoryPath, match)).ToArray();

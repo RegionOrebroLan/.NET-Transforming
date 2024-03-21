@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.Web.XmlTransform;
 using RegionOrebroLan.Transforming.IO;
 using RegionOrebroLan.Transforming.IO.Extensions;
@@ -17,7 +16,6 @@ namespace RegionOrebroLan.Transforming
 
 		#region Methods
 
-		[SuppressMessage("Security", "CA3075:Insecure DTD processing in XML")]
 		protected internal override void TransformInternal(string destination, string source, string transformation, bool? avoidByteOrderMark = null)
 		{
 			var useByteOrderMark = this.UseByteOrderMark(avoidByteOrderMark, source);
