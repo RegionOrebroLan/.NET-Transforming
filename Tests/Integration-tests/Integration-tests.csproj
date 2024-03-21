@@ -3,7 +3,7 @@
 		<RootNamespace>IntegrationTests</RootNamespace>
 	</PropertyGroup>
 	<ItemGroup>
-		<Folder Include="Test-resources\Empty\" />
+		<Folder Include="Resources\Empty\" />
 	</ItemGroup>
 	<Target Name="EnsureFolders" BeforeTargets="BeforeBuild">
 		<MakeDir Condition="!Exists('%(Folder.FullPath)')" Directories="%(Folder.FullPath)" />

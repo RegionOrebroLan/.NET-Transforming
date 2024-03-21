@@ -8,7 +8,7 @@ namespace IntegrationTests.IO
 	{
 		#region Fields
 
-		private static readonly DirectoryInfo _testResourceDirectory = new(Path.Combine(Global.ProjectDirectory.FullName, "Test-resources"));
+		private static readonly DirectoryInfo _testResourceDirectory = new(Path.Combine(Global.ProjectDirectory.FullName, "Resources"));
 
 		#endregion
 

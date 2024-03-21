@@ -399,3 +399,5 @@ FodyWeavers.xsd
 
 # Custom
 StrongName.snk
+
+Tests/Integration-tests/Transform-output/*
