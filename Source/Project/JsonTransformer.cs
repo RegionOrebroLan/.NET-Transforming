@@ -6,14 +6,8 @@ using RegionOrebroLan.Transforming.Text.Extensions;
 
 namespace RegionOrebroLan.Transforming
 {
-	public class JsonTransformer : BasicFileTransformer
+	public class JsonTransformer(IFileSystem fileSystem, IPlatform platform) : BasicFileTransformer(fileSystem, platform)
 	{
-		#region Constructors
-
-		public JsonTransformer(IFileSystem fileSystem, IPlatform platform) : base(fileSystem, platform) { }
-
-		#endregion
-
 		#region Methods
 
 		protected internal override void TransformInternal(string destination, string source, string transformation, bool? avoidByteOrderMark = null)

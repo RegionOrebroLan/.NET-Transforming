@@ -3,20 +3,11 @@ using RegionOrebroLan.Transforming.IO.Extensions;
 
 namespace RegionOrebroLan.Transforming
 {
-	public class DirectoryHandler : IPackageHandler
+	public class DirectoryHandler(IFileSystem fileSystem) : IPackageHandler
 	{
-		#region Constructors
-
-		public DirectoryHandler(IFileSystem fileSystem)
-		{
-			this.FileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
-		}
-
-		#endregion
-
 		#region Properties
 
-		protected internal virtual IFileSystem FileSystem { get; }
+		protected internal virtual IFileSystem FileSystem { get; } = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
 
 		#endregion
 

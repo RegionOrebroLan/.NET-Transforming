@@ -3,7 +3,7 @@ using RegionOrebroLan.Transforming.IO;
 
 namespace RegionOrebroLan.Transforming
 {
-	public class PackageHandlerLoader : IPackageHandlerLoader
+	public class PackageHandlerLoader(IFileSystem fileSystem) : IPackageHandlerLoader
 	{
 		#region Fields
 
@@ -11,18 +11,9 @@ namespace RegionOrebroLan.Transforming
 
 		#endregion
 
-		#region Constructors
-
-		public PackageHandlerLoader(IFileSystem fileSystem)
-		{
-			this.FileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
-		}
-
-		#endregion
-
 		#region Properties
 
-		protected internal virtual IFileSystem FileSystem { get; }
+		protected internal virtual IFileSystem FileSystem { get; } = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
 
 		protected internal virtual IDictionary<string, IPackageHandler> Handlers
 		{

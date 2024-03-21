@@ -5,20 +5,11 @@ using RegionOrebroLan.Transforming.IO.Extensions;
 
 namespace RegionOrebroLan.Transforming
 {
-	public class ZipFileHandler : IPackageHandler
+	public class ZipFileHandler(IFileSystem fileSystem) : IPackageHandler
 	{
-		#region Constructors
-
-		public ZipFileHandler(IFileSystem fileSystem)
-		{
-			this.FileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
-		}
-
-		#endregion
-
 		#region Properties
 
-		protected internal virtual IFileSystem FileSystem { get; }
+		protected internal virtual IFileSystem FileSystem { get; } = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
 
 		#endregion
 

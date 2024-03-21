@@ -5,22 +5,12 @@ using RegionOrebroLan.Transforming.Runtime;
 
 namespace RegionOrebroLan.Transforming
 {
-	public abstract class BasicFileTransformer : IFileTransformer
+	public abstract class BasicFileTransformer(IFileSystem fileSystem, IPlatform platform) : IFileTransformer
 	{
-		#region Constructors
-
-		protected BasicFileTransformer(IFileSystem fileSystem, IPlatform platform)
-		{
-			this.FileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
-			this.Platform = platform ?? throw new ArgumentNullException(nameof(platform));
-		}
-
-		#endregion
-
 		#region Properties
 
-		protected internal virtual IFileSystem FileSystem { get; }
-		protected internal virtual IPlatform Platform { get; }
+		protected internal virtual IFileSystem FileSystem { get; } = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+		protected internal virtual IPlatform Platform { get; } = platform ?? throw new ArgumentNullException(nameof(platform));
 
 		#endregion
 
