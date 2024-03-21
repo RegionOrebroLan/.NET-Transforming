@@ -11,46 +11,31 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dotnet: [
-          {
-            framework: netcoreapp3.1,
-            version: 3.1.x
-          },
-          {
-            framework: net5.0,
-            version: 5.0.x
-          },
-          {
-            framework: net6.0,
-            version: 6.0.x
-          },
-          {
-            framework: net7.0,
-            version: 7.0.x
-          },
-          {
-            framework: net8.0,
-            version: 8.0.x
-          }
-        ]
-        os: [
-          macOS-latest,
-          ubuntu-latest,
-          windows-latest
-        ]
-    name: ${{ matrix.os }} - ${{ matrix.dotnet.framework }} - ${{ matrix.dotnet.version }}
+        os: [ macOS-latest, ubuntu-latest, windows-latest ]
+    name: ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     steps:
-    - name: Information
-      run: echo ${{ matrix.dotnet.framework }} - ${{ matrix.dotnet.version }}
     - uses: actions/checkout@v4
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: ${{ matrix.dotnet.version }}
+        dotnet-version: |
+          3.1.x
+          5.0.x
+          6.0.x
+          7.0.x
+          8.0.x
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
       run: dotnet build --configuration Release --no-restore
-    - name: Test
-      run: dotnet test --configuration Release --framework ${{ matrix.dotnet.framework }} --no-build --verbosity normal
+    - name: Test - netcoreapp3.1
+      run: dotnet test --configuration Release --framework netcoreapp3.1 --no-build --verbosity normal
+    - name: Test - net5.0
+      run: dotnet test --configuration Release --framework net5.0 --no-build --verbosity normal
+    - name: Test - net6.0
+      run: dotnet test --configuration Release --framework net6.0 --no-build --verbosity normal
+    - name: Test - net7.0
+      run: dotnet test --configuration Release --framework net7.0 --no-build --verbosity normal
+    - name: Test - net8.0
+      run: dotnet test --configuration Release --framework net8.0 --no-build --verbosity normal
