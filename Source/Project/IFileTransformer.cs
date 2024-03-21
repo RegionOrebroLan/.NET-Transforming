@@ -4,7 +4,7 @@ namespace RegionOrebroLan.Transforming
 	{
 		#region Methods
 
-		void Transform(string destination, string source, string transformation);
+		void Transform(string destination, string source, string transformation, bool? avoidByteOrderMark = null);
 
 		#endregion
 	}

@@ -7,8 +7,7 @@ namespace IntegrationTests
 		#region Fields
 
 		private DirectoryInfo _outputDirectory;
-		private static readonly string _outputDirectoryPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Transform-output");
-		private static readonly DirectoryInfo _projectDirectory = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory).Parent?.Parent?.Parent;
+		private static readonly string _outputDirectoryPath = Path.Combine(Global.ProjectDirectory.FullName, "Transform-output");
 		private DirectoryInfo _testResourceDirectory;
 
 		#endregion
@@ -29,9 +28,9 @@ namespace IntegrationTests
 		}
 
 		protected internal virtual string OutputDirectoryPath => _outputDirectoryPath;
-		protected internal virtual DirectoryInfo ProjectDirectory => _projectDirectory;
+		protected internal virtual DirectoryInfo ProjectDirectory => Global.ProjectDirectory;
 		protected internal abstract string ProjectRelativeTestResourceDirectoryPath { get; }
-		protected internal virtual DirectoryInfo TestResourceDirectory => this._testResourceDirectory ?? (this._testResourceDirectory = new DirectoryInfo(Path.Combine(this.ProjectDirectory.FullName, this.ProjectRelativeTestResourceDirectoryPath)));
+		protected internal virtual DirectoryInfo TestResourceDirectory => this._testResourceDirectory ??= new DirectoryInfo(Path.Combine(this.ProjectDirectory.FullName, this.ProjectRelativeTestResourceDirectoryPath));
 
 		#endregion
 

@@ -3,6 +3,7 @@ using IntegrationTests.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RegionOrebroLan.Transforming;
 using RegionOrebroLan.Transforming.IO;
+using RegionOrebroLan.Transforming.Runtime;
 
 namespace IntegrationTests
 {
@@ -26,7 +27,7 @@ namespace IntegrationTests
 				{
 					var fileSystem = new FileSystem();
 
-					_packageTransformer = new PackageTransformer(new FileSearcher(), fileSystem, new FileTransformerFactory(fileSystem), new PackageHandlerLoader(fileSystem));
+					_packageTransformer = new PackageTransformer(new FileSearcher(), fileSystem, new FileTransformerFactory(fileSystem, new Platform()), new PackageHandlerLoader(fileSystem));
 				}
 				// ReSharper restore InvertIf
 

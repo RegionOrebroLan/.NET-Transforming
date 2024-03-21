@@ -2,6 +2,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using RegionOrebroLan.Transforming;
 using RegionOrebroLan.Transforming.IO;
+using RegionOrebroLan.Transforming.Runtime;
 
 namespace UnitTests
 {
@@ -17,33 +18,74 @@ namespace UnitTests
 
 		#region Properties
 
-		protected internal virtual BasicFileTransformer BasicFileTransformer
-		{
-			get
-			{
-				// ReSharper disable InvertIf
-				if(_basicFileTransformer == null)
-				{
-					var fileSystemMock = new Mock<IFileSystem>();
-
-					var fileMock = new Mock<IFile>();
-					fileMock.Setup(file => file.Exists(It.IsAny<string>())).Returns<string>(path => string.Equals(path, this.ExistingPath, StringComparison.OrdinalIgnoreCase));
-
-					fileSystemMock.Setup(fileSystem => fileSystem.File).Returns(fileMock.Object);
-
-					_basicFileTransformer = new Mock<BasicFileTransformer>(fileSystemMock.Object) { CallBase = true }.Object;
-				}
-				// ReSharper restore InvertIf
-
-				return _basicFileTransformer;
-			}
-		}
-
+		protected internal virtual BasicFileTransformer BasicFileTransformer => _basicFileTransformer ??= CreateBasicFileTransformer(this.ExistingPath, true);
 		protected internal virtual string ExistingPath => _existingPath;
 
 		#endregion
 
 		#region Methods
+
+		private static BasicFileTransformer CreateBasicFileTransformer(bool isWindows)
+		{
+			return CreateBasicFileTransformer(_existingPath, isWindows);
+		}
+
+		private static BasicFileTransformer CreateBasicFileTransformer(string existingPath, bool isWindows)
+		{
+			var fileSystemMock = new Mock<IFileSystem>();
+
+			var fileMock = new Mock<IFile>();
+			fileMock.Setup(file => file.Exists(It.IsAny<string>())).Returns<string>(path => string.Equals(path, existingPath, StringComparison.OrdinalIgnoreCase));
+
+			fileSystemMock.Setup(fileSystem => fileSystem.File).Returns(fileMock.Object);
+
+			var platformMock = new Mock<IPlatform>();
+			platformMock.Setup(runtime => runtime.IsWindows).Returns(isWindows);
+
+			return new Mock<BasicFileTransformer>(fileSystemMock.Object, platformMock.Object) { CallBase = true }.Object;
+		}
+
+		[TestMethod]
+		public void ResolveAvoidByteOrderMark_IfTheAvoidByteOrderMarkParameterIsFalse_And_ThePlatformIsNotWindows_ShouldReturnFalse()
+		{
+			var basicFileTransformer = CreateBasicFileTransformer(false);
+			Assert.IsFalse(basicFileTransformer.ResolveAvoidByteOrderMark(false));
+		}
+
+		[TestMethod]
+		public void ResolveAvoidByteOrderMark_IfTheAvoidByteOrderMarkParameterIsFalse_And_ThePlatformIsWindows_ShouldReturnFalse()
+		{
+			var basicFileTransformer = CreateBasicFileTransformer(true);
+			Assert.IsFalse(basicFileTransformer.ResolveAvoidByteOrderMark(false));
+		}
+
+		[TestMethod]
+		public void ResolveAvoidByteOrderMark_IfTheAvoidByteOrderMarkParameterIsNull_And_ThePlatformIsNotWindows_ShouldReturnTrue()
+		{
+			var basicFileTransformer = CreateBasicFileTransformer(false);
+			Assert.IsTrue(basicFileTransformer.ResolveAvoidByteOrderMark(null));
+		}
+
+		[TestMethod]
+		public void ResolveAvoidByteOrderMark_IfTheAvoidByteOrderMarkParameterIsNull_And_ThePlatformIsWindows_ShouldReturnFalse()
+		{
+			var basicFileTransformer = CreateBasicFileTransformer(true);
+			Assert.IsFalse(basicFileTransformer.ResolveAvoidByteOrderMark(null));
+		}
+
+		[TestMethod]
+		public void ResolveAvoidByteOrderMark_IfTheAvoidByteOrderMarkParameterIsTrue_And_ThePlatformIsNotWindows_ShouldReturnTrue()
+		{
+			var basicFileTransformer = CreateBasicFileTransformer(false);
+			Assert.IsTrue(basicFileTransformer.ResolveAvoidByteOrderMark(true));
+		}
+
+		[TestMethod]
+		public void ResolveAvoidByteOrderMark_IfTheAvoidByteOrderMarkParameterIsTrue_And_ThePlatformIsWindows_ShouldReturnTrue()
+		{
+			var basicFileTransformer = CreateBasicFileTransformer(true);
+			Assert.IsTrue(basicFileTransformer.ResolveAvoidByteOrderMark(true));
+		}
 
 		[TestMethod]
 		[ExpectedException(typeof(ArgumentException))]

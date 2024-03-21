@@ -13,8 +13,8 @@ Library for json-, package- and xml-transformation. The package-transformer can 
 	var source = @"C:\Data\Transforming\Sources\AppSettings.json";
 	var transformation = @"C:\Data\Transforming\Sources\AppSettings.Release.json";
 
-	// You can register IFileSystem and IFileTransformerFactory in your preferred IoC container.
-	var fileTransformerFactory = new FileTransformerFactory(new FileSystem());
+	// You can register IFileSystem, IFileTransformerFactory and IPlatform in your preferred IoC container.
+	var fileTransformerFactory = new FileTransformerFactory(new FileSystem(), new Platform());
 
 	fileTransformerFactory.Create(source).Transform(destination, source, transformation);
 
@@ -24,8 +24,8 @@ Library for json-, package- and xml-transformation. The package-transformer can 
 	var source = @"C:\Data\Transforming\Sources\Web.config";
 	var transformation = @"C:\Data\Transforming\Sources\Web.Release.config";
 
-	// You can register IFileSystem and IFileTransformerFactory in your preferred IoC container.
-	var fileTransformerFactory = new FileTransformerFactory(new FileSystem());
+	// You can register IFileSystem, IFileTransformerFactory and IPlatform in your preferred IoC container.
+	var fileTransformerFactory = new FileTransformerFactory(new FileSystem(), new Platform());
 
 	fileTransformerFactory.Create(source).Transform(destination, source, transformation);
 
@@ -35,9 +35,9 @@ Library for json-, package- and xml-transformation. The package-transformer can 
 
 First you set the parameters, see the different examples below. Then:
 
-	// You can register IFileSearcher, IFileSystem, IFileTransformerFactory and IPackageHandlerLoader in your preferred IoC container.
+	// You can register IFileSearcher, IFileSystem, IFileTransformerFactory, IPackageHandlerLoader and IPlatform in your preferred IoC container.
 	var fileSystem = new FileSystem();
-	var packageTransformer = new PackageTransformer(new FileMatcher(), fileSystem, new FileTransformerFactory(fileSystem), new PackageHandlerLoader(fileSystem));
+	var packageTransformer = new PackageTransformer(new FileMatcher(), fileSystem, new FileTransformerFactory(fileSystem, new Platform()), new PackageHandlerLoader(fileSystem));
 
 	// The actual transforming is done under the %temp%-directory. The cleanup-parameter (the first boolean parameter) is for removing the temporary transform-directories or not.
 	packageTransformer.Transform(true, destination, fileToTransformPatterns, pathToDeletePatterns, source, transformationNames);
@@ -86,6 +86,15 @@ Patterns with absolute paths does not result in any matches.
 	var pathToDeletePatterns = new[] {"**/Directory-To-Delete/**", @"**/File-To-Delete.*"};
 	var source = @"C:\Data\Transforming\Sources\Package.zip";
 	var transformationNames = new[] {"Release", "Test"};
+
+### 1.3 Common
+
+All the transform-methods above also have the parameter **avoidByteOrderMark null/true/false**, *bool? avoidByteOrderMark = null*. The final value for this parameter if not set (null) is:
+
+- On Windows: false
+- On other platforms (Linux/MacOS): true
+
+This parameter controls the result of the transformation. If a source file that will be transformed has a BOM (Byte Order Mark) the destination file should also have a BOM. This is not always desired, e.g. on a Linux system. So if the source file has a BOM but the parameter "avoidByteOrderMark" is set to true, the destination file will not have a BOM.
 
 ## 2 Development
 

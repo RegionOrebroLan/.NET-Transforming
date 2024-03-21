@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Xml;
 using RegionOrebroLan.Transforming.IO;
+using RegionOrebroLan.Transforming.Runtime;
 
 namespace RegionOrebroLan.Transforming
 {
@@ -8,9 +9,10 @@ namespace RegionOrebroLan.Transforming
 	{
 		#region Constructors
 
-		public FileTransformerFactory(IFileSystem fileSystem)
+		public FileTransformerFactory(IFileSystem fileSystem, IPlatform platform)
 		{
 			this.FileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+			this.Platform = platform ?? throw new ArgumentNullException(nameof(platform));
 		}
 
 		#endregion
@@ -18,6 +20,7 @@ namespace RegionOrebroLan.Transforming
 		#region Properties
 
 		protected internal virtual IFileSystem FileSystem { get; }
+		protected internal virtual IPlatform Platform { get; }
 
 		#endregion
 
@@ -35,10 +38,10 @@ namespace RegionOrebroLan.Transforming
 				throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "The source \"{0}\" does not exist.", source), nameof(source));
 
 			if(this.IsJsonFile(source))
-				return new JsonTransformer(this.FileSystem);
+				return new JsonTransformer(this.FileSystem, this.Platform);
 
 			if(this.IsXmlFile(source))
-				return new XmlTransformer(this.FileSystem);
+				return new XmlTransformer(this.FileSystem, this.Platform);
 
 			throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "A transformer for file \"{0}\" could not be created.", source));
 		}

@@ -8,9 +8,7 @@ namespace IntegrationTests.IO
 	{
 		#region Fields
 
-		// ReSharper disable PossibleNullReferenceException
-		private static readonly DirectoryInfo _testResourceDirectory = new DirectoryInfo(Path.Combine(new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.Parent.FullName, "Test-resources"));
-		// ReSharper restore PossibleNullReferenceException
+		private static readonly DirectoryInfo _testResourceDirectory = new(Path.Combine(Global.ProjectDirectory.FullName, "Test-resources"));
 
 		#endregion
 

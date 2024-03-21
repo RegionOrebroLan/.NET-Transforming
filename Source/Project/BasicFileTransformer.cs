@@ -1,5 +1,7 @@
 using System.Globalization;
 using RegionOrebroLan.Transforming.IO;
+using RegionOrebroLan.Transforming.IO.Extensions;
+using RegionOrebroLan.Transforming.Runtime;
 
 namespace RegionOrebroLan.Transforming
 {
@@ -7,9 +9,10 @@ namespace RegionOrebroLan.Transforming
 	{
 		#region Constructors
 
-		protected BasicFileTransformer(IFileSystem fileSystem)
+		protected BasicFileTransformer(IFileSystem fileSystem, IPlatform platform)
 		{
 			this.FileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+			this.Platform = platform ?? throw new ArgumentNullException(nameof(platform));
 		}
 
 		#endregion
@@ -17,12 +20,21 @@ namespace RegionOrebroLan.Transforming
 		#region Properties
 
 		protected internal virtual IFileSystem FileSystem { get; }
+		protected internal virtual IPlatform Platform { get; }
 
 		#endregion
 
 		#region Methods
 
-		public virtual void Transform(string destination, string source, string transformation)
+		protected internal virtual bool ResolveAvoidByteOrderMark(bool? avoidByteOrderMark)
+		{
+			if(avoidByteOrderMark == null)
+				return !this.Platform.IsWindows;
+
+			return avoidByteOrderMark.Value;
+		}
+
+		public virtual void Transform(string destination, string source, string transformation, bool? avoidByteOrderMark = null)
 		{
 			if(destination == null)
 				throw new ArgumentNullException(nameof(destination));
@@ -50,7 +62,7 @@ namespace RegionOrebroLan.Transforming
 
 			try
 			{
-				this.TransformInternal(destination, source, transformation);
+				this.TransformInternal(destination, source, transformation, avoidByteOrderMark);
 			}
 			catch(Exception exception)
 			{
@@ -58,7 +70,15 @@ namespace RegionOrebroLan.Transforming
 			}
 		}
 
-		protected internal abstract void TransformInternal(string destination, string source, string transformation);
+		protected internal abstract void TransformInternal(string destination, string source, string transformation, bool? avoidByteOrderMark = null);
+
+		protected internal virtual bool UseByteOrderMark(bool? avoidByteOrderMark, string source)
+		{
+			using(var streamReader = new StreamReader(source, true))
+			{
+				return streamReader.HasByteOrderMark() && !this.ResolveAvoidByteOrderMark(avoidByteOrderMark);
+			}
+		}
 
 		#endregion
 	}

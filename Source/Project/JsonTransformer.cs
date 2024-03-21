@@ -1,7 +1,8 @@
-using System.Text;
 using Microsoft.VisualStudio.Jdt;
 using RegionOrebroLan.Transforming.IO;
 using RegionOrebroLan.Transforming.IO.Extensions;
+using RegionOrebroLan.Transforming.Runtime;
+using RegionOrebroLan.Transforming.Text.Extensions;
 
 namespace RegionOrebroLan.Transforming
 {
@@ -9,34 +10,24 @@ namespace RegionOrebroLan.Transforming
 	{
 		#region Constructors
 
-		public JsonTransformer(IFileSystem fileSystem) : base(fileSystem) { }
+		public JsonTransformer(IFileSystem fileSystem, IPlatform platform) : base(fileSystem, platform) { }
 
 		#endregion
 
 		#region Methods
 
-		protected internal virtual void SaveToFile(string destination, Stream stream)
+		protected internal override void TransformInternal(string destination, string source, string transformation, bool? avoidByteOrderMark = null)
 		{
-			Encoding encoding;
-			string content;
+			var useByteOrderMark = this.UseByteOrderMark(avoidByteOrderMark, source);
 
-			using(var streamReader = new StreamReader(stream, true))
-			{
-				// ReSharper disable ReturnValueOfPureMethodIsNotUsed
-				streamReader.Peek();
-				// ReSharper restore ReturnValueOfPureMethodIsNotUsed
-				encoding = streamReader.CurrentEncoding;
-				content = streamReader.ReadToEnd();
-			}
-
-			this.FileSystem.WriteFile(content, encoding, destination);
-		}
-
-		protected internal override void TransformInternal(string destination, string source, string transformation)
-		{
 			using(var stream = new JsonTransformation(transformation).Apply(source))
 			{
-				this.SaveToFile(destination, stream);
+				using(var streamReader = new StreamReader(stream, true))
+				{
+					var encoding = useByteOrderMark ? streamReader.CurrentEncoding : streamReader.CurrentEncoding.WithoutByteOrderMark();
+
+					this.FileSystem.WriteFile(streamReader.ReadToEnd(), encoding, destination);
+				}
 			}
 		}
 

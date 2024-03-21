@@ -2,10 +2,15 @@
 # Suppress
 dotnet_diagnostic.CA1307.severity = none
 dotnet_diagnostic.CA1707.severity = none
+dotnet_diagnostic.CA1716.severity = none
 dotnet_diagnostic.CA1861.severity = none
+dotnet_diagnostic.CA2211.severity = none
 dotnet_diagnostic.CA5394.severity = none
 dotnet_diagnostic.IDE0074.severity = none
 dotnet_diagnostic.IDE0090.severity = none
 
 # Temporary
 dotnet_diagnostic.CA1510.severity = none
+
+[/Integration-tests/Text/Extensions/EncodingExtensionTest.cs]
+dotnet_diagnostic.SYSLIB0001.severity = none

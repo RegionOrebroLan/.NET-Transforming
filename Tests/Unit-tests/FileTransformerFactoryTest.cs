@@ -2,6 +2,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using RegionOrebroLan.Transforming;
 using RegionOrebroLan.Transforming.IO;
+using RegionOrebroLan.Transforming.Runtime;
 
 namespace UnitTests
 {
@@ -16,7 +17,7 @@ namespace UnitTests
 
 		#region Properties
 
-		protected internal virtual FileTransformerFactory FileTransformerFactory => _fileTransformerFactory ?? (_fileTransformerFactory = new FileTransformerFactory(Mock.Of<IFileSystem>()));
+		protected internal virtual FileTransformerFactory FileTransformerFactory => _fileTransformerFactory ??= new FileTransformerFactory(Mock.Of<IFileSystem>(), Mock.Of<IPlatform>());
 
 		#endregion
 

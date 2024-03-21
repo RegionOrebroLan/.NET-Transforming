@@ -229,7 +229,7 @@ namespace RegionOrebroLan.Transforming
 			return string.Equals(this.NormalizePath(firstPath), this.NormalizePath(secondPath), StringComparison.OrdinalIgnoreCase);
 		}
 
-		protected internal virtual void Transform(string directoryPath, IEnumerable<string> fileToTransformPatterns, IEnumerable<string> transformationNames)
+		protected internal virtual void Transform(string directoryPath, IEnumerable<string> fileToTransformPatterns, IEnumerable<string> transformationNames, bool? avoidByteOrderMark = null)
 		{
 			foreach(var item in this.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames))
 			{
@@ -239,14 +239,14 @@ namespace RegionOrebroLan.Transforming
 						continue;
 
 					if(transformFileInformation.Value)
-						this.FileTransformerFactory.Create(item.Key).Transform(item.Key, item.Key, transformFileInformation.Key);
+						this.FileTransformerFactory.Create(item.Key).Transform(item.Key, item.Key, transformFileInformation.Key, avoidByteOrderMark);
 
 					this.FileSystem.File.Delete(transformFileInformation.Key);
 				}
 			}
 		}
 
-		public void Transform(bool cleanup, string destination, IEnumerable<string> fileToTransformPatterns, IEnumerable<string> pathToDeletePatterns, string source, IEnumerable<string> transformationNames)
+		public void Transform(bool cleanup, string destination, IEnumerable<string> fileToTransformPatterns, IEnumerable<string> pathToDeletePatterns, string source, IEnumerable<string> transformationNames, bool? avoidByteOrderMark = null)
 		{
 			if(destination == null)
 				throw new ArgumentNullException(nameof(destination));
@@ -288,10 +288,10 @@ namespace RegionOrebroLan.Transforming
 				throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "The source \"{0}\" is invalid.", source), nameof(source), exception);
 			}
 
-			this.TransformInternal(cleanup, destination, fileToTransformPatterns, packageExtractor, packageWriter, pathToDeletePatterns, source, transformationNames);
+			this.TransformInternal(cleanup, destination, fileToTransformPatterns, packageExtractor, packageWriter, pathToDeletePatterns, source, transformationNames, avoidByteOrderMark);
 		}
 
-		protected internal virtual void TransformInternal(bool cleanup, string destination, IEnumerable<string> fileToTransformPatterns, IPackageExtractor packageExtractor, IPackageWriter packageWriter, IEnumerable<string> pathToDeletePatterns, string source, IEnumerable<string> transformationNames)
+		protected internal virtual void TransformInternal(bool cleanup, string destination, IEnumerable<string> fileToTransformPatterns, IPackageExtractor packageExtractor, IPackageWriter packageWriter, IEnumerable<string> pathToDeletePatterns, string source, IEnumerable<string> transformationNames, bool? avoidByteOrderMark = null)
 		{
 			if(packageExtractor == null)
 				throw new ArgumentNullException(nameof(packageExtractor));
@@ -311,7 +311,7 @@ namespace RegionOrebroLan.Transforming
 
 				this.FileSystem.CopyDirectory(temporaryTransformDirectoryPath, temporaryOriginalDirectoryPath);
 
-				this.Transform(temporaryTransformDirectoryPath, fileToTransformPatterns, transformationNames);
+				this.Transform(temporaryTransformDirectoryPath, fileToTransformPatterns, transformationNames, avoidByteOrderMark);
 
 				this.DeleteItems(temporaryTransformDirectoryPath, pathToDeletePatterns);
 

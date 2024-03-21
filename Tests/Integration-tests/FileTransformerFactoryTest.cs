@@ -1,6 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RegionOrebroLan.Transforming;
 using RegionOrebroLan.Transforming.IO;
+using RegionOrebroLan.Transforming.Runtime;
 
 namespace IntegrationTests
 {
@@ -15,7 +16,7 @@ namespace IntegrationTests
 
 		#region Properties
 
-		protected internal virtual FileTransformerFactory FileTransformerFactory => _fileTransformerFactory ?? (_fileTransformerFactory = new FileTransformerFactory(new FileSystem()));
+		protected internal virtual FileTransformerFactory FileTransformerFactory => _fileTransformerFactory ??= new FileTransformerFactory(new FileSystem(), new Platform());
 
 		#endregion
 

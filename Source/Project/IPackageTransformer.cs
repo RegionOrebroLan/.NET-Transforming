@@ -4,7 +4,7 @@ namespace RegionOrebroLan.Transforming
 	{
 		#region Methods
 
-		void Transform(bool cleanup, string destination, IEnumerable<string> fileToTransformPatterns, IEnumerable<string> pathToDeletePatterns, string source, IEnumerable<string> transformationNames);
+		void Transform(bool cleanup, string destination, IEnumerable<string> fileToTransformPatterns, IEnumerable<string> pathToDeletePatterns, string source, IEnumerable<string> transformationNames, bool? avoidByteOrderMark = null);
 
 		#endregion
 	}
