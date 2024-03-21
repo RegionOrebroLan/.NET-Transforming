@@ -33,14 +33,11 @@ namespace RegionOrebroLan.Transforming
 				{
 					lock(this.HandlersLock)
 					{
-						if(this._handlers == null)
+						this._handlers ??= new Dictionary<string, IPackageHandler>(StringComparer.OrdinalIgnoreCase)
 						{
-							this._handlers = new Dictionary<string, IPackageHandler>(StringComparer.OrdinalIgnoreCase)
-							{
-								{ string.Empty, new DirectoryHandler(this.FileSystem) },
-								{ "zip", new ZipFileHandler(this.FileSystem) }
-							};
-						}
+							{ string.Empty, new DirectoryHandler(this.FileSystem) },
+							{ "zip", new ZipFileHandler(this.FileSystem) }
+						};
 					}
 				}
 				// ReSharper restore InvertIf
