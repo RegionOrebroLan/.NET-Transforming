@@ -1,3 +1,5 @@
+using RegionOrebroLan.Transforming.IO.Extensions;
+
 namespace RegionOrebroLan.Transforming.IO
 {
 	public class PathWrapper : IPath
@@ -29,6 +31,11 @@ namespace RegionOrebroLan.Transforming.IO
 		public virtual string GetTempPath()
 		{
 			return Path.GetTempPath();
+		}
+
+		public virtual bool IsPathFullyQualified(string path)
+		{
+			return PathExtension.IsPathFullyQualified(path);
 		}
 
 		public virtual bool IsPathRooted(string path)

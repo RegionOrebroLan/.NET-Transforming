@@ -97,38 +97,36 @@ namespace UnitTests
 		}
 
 		[TestMethod]
-		public void ValidateFilePath_IfAllParametersAreNull_ShouldNotThrowAnException()
+		public async Task ValidateFilePath_IfAllParametersAreNull_ShouldNotThrowAnException()
 		{
+			await Task.CompletedTask;
+
 			this.PackageTransformer.ValidateFilePath(null, null, null);
 		}
 
 		[TestMethod]
-		public void ValidateFilePath_IfTheFilePathParameterIsAnEmptyString_ShouldNotThrowAnException()
+		public async Task ValidateFilePath_IfTheFilePathParameterIsAnEmptyString_ShouldNotThrowAnException()
 		{
-			this.ValidateFilePathShouldNotThrowAnException(string.Empty);
+			await this.ValidateFilePathShouldNotThrowAnException(string.Empty);
 		}
 
 		[TestMethod]
-		public void ValidateFilePath_IfTheFilePathParameterIsNull_ShouldNotThrowAnException()
+		public async Task ValidateFilePath_IfTheFilePathParameterIsNull_ShouldNotThrowAnException()
 		{
-			this.ValidateFilePathShouldNotThrowAnException(null);
+			await this.ValidateFilePathShouldNotThrowAnException(null);
 		}
 
 		[TestMethod]
-		public void ValidateFilePath_IfTheFilePathParameterIsOnlyWhitespaces_ShouldNotThrowAnException()
+		public async Task ValidateFilePath_IfTheFilePathParameterIsOnlyWhitespaces_ShouldNotThrowAnException()
 		{
-			this.ValidateFilePathShouldNotThrowAnException("    ");
+			await this.ValidateFilePathShouldNotThrowAnException("    ");
 		}
 
-		protected internal virtual void ValidateFilePathShouldNotThrowAnException(string filePath)
+		protected internal virtual async Task ValidateFilePathShouldNotThrowAnException(string filePath)
 		{
+			await Task.CompletedTask;
+
 			this.PackageTransformer.ValidateFilePath(null, null, filePath);
-			this.PackageTransformer.ValidateFilePath(null, string.Empty, filePath);
-			this.PackageTransformer.ValidateFilePath(string.Empty, null, filePath);
-			this.PackageTransformer.ValidateFilePath(string.Empty, string.Empty, filePath);
-			this.PackageTransformer.ValidateFilePath(null, "Test", filePath);
-			this.PackageTransformer.ValidateFilePath("Test", null, filePath);
-			this.PackageTransformer.ValidateFilePath("Test", "Test", filePath);
 		}
 
 		#endregion

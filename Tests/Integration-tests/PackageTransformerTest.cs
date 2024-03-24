@@ -1,4 +1,5 @@
 using System.IO.Compression;
+using System.Runtime.InteropServices;
 using IntegrationTests.Helpers;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -674,14 +675,27 @@ namespace IntegrationTests
 
 		[TestMethod]
 		[ExpectedException(typeof(InvalidOperationException))]
-		public void ValidateFilePath_IfTheDirectoryIsNotABaseOfTheFile_ShouldThrowAnInvalidOperationException()
+		public void ValidateFilePath_IfTheDirectoryIsNotAnAncestorOfTheFile_ShouldThrowAnInvalidOperationException()
 		{
 			const string action = "test";
+			var directoryPaths = new List<string>();
 			var exceptions = new List<InvalidOperationException>();
+			var filePaths = new List<string>();
 
-			foreach(var directoryPath in new[] { @"C:\Some-directory", @"C:\Some-directory\" })
+			if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
-				foreach(var filePath in new[] { @"C:\Some-other-directory\Some-file.txt", @"C:\Some-other-directory\", @"C:\Some-other-directory" })
+				directoryPaths.AddRange([@"C:\Some-directory", @"C:\Some-directory\"]);
+				filePaths.AddRange([@"C:\Some-other-directory\Some-file.txt", @"C:\Some-other-directory\", @"C:\Some-other-directory"]);
+			}
+			else
+			{
+				directoryPaths.AddRange(["/Some-directory", @"/Some-directory/"]);
+				filePaths.AddRange([@"/Some-other-directory/Some-file.txt", "/Some-other-directory/", "/Some-other-directory"]);
+			}
+
+			foreach(var directoryPath in directoryPaths)
+			{
+				foreach(var filePath in filePaths)
 				{
 					try
 					{
@@ -700,60 +714,82 @@ namespace IntegrationTests
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(ArgumentException))]
-		public void ValidateFilePath_IfTheDirectoryPathIsRelative_ShouldThrowAnArgumentException()
+		[ExpectedException(typeof(ArgumentNullException))]
+		public void ValidateFilePath_IfTheDirectoryPathIsNull_And_IfTheFilePathIsAbsolute_ShouldThrowAnArgumentNullException()
 		{
-			var exceptions = new List<ArgumentException>();
-
-			foreach(var directoryPath in new[] { "Directory", "/Directory", @"\Directory" })
-			{
-				try
-				{
-					this.PackageTransformer.ValidateFilePath("Test", directoryPath, @"C:\Test.txt");
-				}
-				catch(ArgumentException argumentException)
-				{
-					if(string.Equals(argumentException.ParamName, nameof(directoryPath), StringComparison.Ordinal) && argumentException.Message.StartsWith($"Could not create an absolute uri from directory-path \"{directoryPath}\".", StringComparison.Ordinal))
-						exceptions.Add(argumentException);
-				}
-			}
-
-			if(exceptions.Count == 3)
-				throw exceptions.First();
-		}
-
-		[TestMethod]
-		[ExpectedException(typeof(InvalidOperationException))]
-		public void ValidateFilePath_IfTheDirectoryPathParameterAndTheFilePathParameterAreEqual_ShouldThrowAnInvalidOperationException()
-		{
-			const string directoryPath = @"C:\Some-directory";
-
 			try
 			{
-				this.PackageTransformer.ValidateFilePath("Test", directoryPath, directoryPath);
+				this.PackageTransformer.ValidateFilePath("Test", null, RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? @"C:\Test.txt" : "/Test.txt");
 			}
-			catch(InvalidOperationException invalidOperationException)
+			catch(ArgumentNullException argumentNullException)
 			{
-				if(string.Equals(invalidOperationException.Message, "The directory-path and file-path can not be equal.", StringComparison.Ordinal))
+				if(argumentNullException.ParamName!.Equals("directoryPath", StringComparison.Ordinal))
 					throw;
 			}
 		}
 
 		[TestMethod]
-		public void ValidateFilePath_IfTheFilePathParameterIsARelativePath_ShouldNotThrowAnException()
+		[ExpectedException(typeof(ArgumentException))]
+		public void ValidateFilePath_IfTheDirectoryPathIsRelative_ShouldThrowAnArgumentException()
 		{
-			this.ValidateFilePathShouldNotThrowAnException("Text.txt");
-			this.ValidateFilePathShouldNotThrowAnException("/Text.txt");
-			this.ValidateFilePathShouldNotThrowAnException(@"\Text.txt");
-			this.ValidateFilePathShouldNotThrowAnException("Directory/Text.txt");
-			this.ValidateFilePathShouldNotThrowAnException(@"Directory\Text.txt");
-			this.ValidateFilePathShouldNotThrowAnException("/Directory/Text.txt");
-			this.ValidateFilePathShouldNotThrowAnException(@"\Directory\Text.txt");
+			var exceptions = new List<ArgumentException>();
+			var directoryPaths = new List<string>();
+			var expectedNumberOfExceptions = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? 5 : 2;
+			string filePath;
+
+			if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				directoryPaths.AddRange(["Directory", "/Directory", "/Directory/", @"\Directory", @"\Directory\"]);
+				filePath = @"C:\Test.txt";
+			}
+			else
+			{
+				directoryPaths.AddRange(["Directory", "Directory/"]);
+				filePath = "/Test.txt";
+			}
+
+			foreach(var directoryPath in directoryPaths)
+			{
+				try
+				{
+					this.PackageTransformer.ValidateFilePath("Test", directoryPath, filePath);
+				}
+				catch(ArgumentException argumentException)
+				{
+					if(string.Equals(argumentException.ParamName, nameof(directoryPath), StringComparison.Ordinal) && argumentException.Message.StartsWith($"The directory-path can not be relative ({directoryPath}).", StringComparison.Ordinal))
+						exceptions.Add(argumentException);
+				}
+			}
+
+			if(exceptions.Count == expectedNumberOfExceptions)
+				throw exceptions.First();
 		}
 
-		protected internal virtual void ValidateFilePathShouldNotThrowAnException(string filePath)
+		[TestMethod]
+		public async Task ValidateFilePath_IfTheFilePathParameterIsARelativePath_ShouldNotThrowAnException()
 		{
-			this.PackageTransformer.ValidateFilePath("Test", @"C:\Some-directory", filePath);
+			await this.ValidateFilePathShouldNotThrowAnException("Text.txt");
+			await this.ValidateFilePathShouldNotThrowAnException("./Text.txt");
+			await this.ValidateFilePathShouldNotThrowAnException("../Text.txt");
+			await this.ValidateFilePathShouldNotThrowAnException("Directory/Text.txt");
+			await this.ValidateFilePathShouldNotThrowAnException("./Directory/Text.txt");
+			await this.ValidateFilePathShouldNotThrowAnException("../Directory/Text.txt");
+
+			if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				await this.ValidateFilePathShouldNotThrowAnException("/Text.txt");
+				await this.ValidateFilePathShouldNotThrowAnException(@"\Text.txt");
+				await this.ValidateFilePathShouldNotThrowAnException(@"Directory\Text.txt");
+				await this.ValidateFilePathShouldNotThrowAnException("/Directory/Text.txt");
+				await this.ValidateFilePathShouldNotThrowAnException(@"\Directory\Text.txt");
+			}
+		}
+
+		protected internal virtual async Task ValidateFilePathShouldNotThrowAnException(string filePath)
+		{
+			await Task.CompletedTask;
+
+			this.PackageTransformer.ValidateFilePath("Test", RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? @"C:\Some-directory" : "/Some-directory", filePath);
 		}
 
 		protected internal virtual void ValidateTransformDestinationParameterException<T>(string destination) where T : ArgumentException

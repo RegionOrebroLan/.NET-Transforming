@@ -330,28 +330,31 @@ namespace RegionOrebroLan.Transforming
 			if(string.IsNullOrWhiteSpace(filePath))
 				return;
 
-			if(!this.FileSystem.Path.IsPathRooted(filePath))
-				return;
-
-			if(!Uri.TryCreate(filePath, UriKind.RelativeOrAbsolute, out var fileUri))
-				throw new ArgumentException($"Could neither create an absolute uri nor a relative uri from file-path \"{filePath}\".", nameof(filePath));
-
-			if(!fileUri.IsAbsoluteUri)
+			// If the file-path is a relative path.
+			if(!this.FileSystem.Path.IsPathFullyQualified(filePath))
 				return;
 
 			if(directoryPath == null)
 				throw new ArgumentNullException(nameof(directoryPath));
 
-			if(!Uri.TryCreate($"{directoryPath.TrimEnd('/', '\\')}\\", UriKind.Absolute, out var directoryUri))
-				throw new ArgumentException($"Could not create an absolute uri from directory-path \"{directoryPath}\".", nameof(directoryPath));
-
-			if(this.PathsAreEqual(directoryPath, filePath))
-				throw new InvalidOperationException($"The directory-path and file-path can not be equal.");
+			if(!this.FileSystem.Path.IsPathFullyQualified(directoryPath))
+				throw new ArgumentException($"The directory-path can not be relative ({directoryPath}).", nameof(directoryPath));
 
 			// We are not allowed to delete files outside the directory-path.
 			// We can not transform files outside the directory-path because we can not resolve the destination for those files.
-			if(!directoryUri.IsBaseOf(fileUri))
-				throw new InvalidOperationException($"It is not allowed to {action} the file \"{filePath}\". The file is outside the directory-path \"{directoryPath}\".");
+			var directory = new DirectoryInfo(directoryPath);
+			var file = new FileInfo(filePath);
+			var parentDirectory = file.Directory;
+
+			while(parentDirectory != null)
+			{
+				if(this.PathsAreEqual(directory.FullName, parentDirectory.FullName))
+					return;
+
+				parentDirectory = parentDirectory.Parent;
+			}
+
+			throw new InvalidOperationException($"It is not allowed to {action} the file \"{filePath}\". The file is outside the directory-path \"{directoryPath}\".");
 		}
 
 		#endregion
