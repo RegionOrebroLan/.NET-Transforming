@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.Jdt;
+using RegionOrebroLan.Transforming.Extensions;
 using RegionOrebroLan.Transforming.IO;
 using RegionOrebroLan.Transforming.IO.Extensions;
 using RegionOrebroLan.Transforming.Runtime;
@@ -21,7 +22,7 @@ namespace RegionOrebroLan.Transforming
 				{
 					var encoding = useByteOrderMark ? streamReader.CurrentEncoding : streamReader.CurrentEncoding.WithoutByteOrderMark();
 
-					this.FileSystem.WriteFile(streamReader.ReadToEnd(), encoding, destination);
+					this.FileSystem.WriteFile(streamReader.ReadToEnd().ResolveNewLines(this.Platform), encoding, destination);
 				}
 			}
 		}
