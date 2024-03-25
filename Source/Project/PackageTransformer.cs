@@ -141,7 +141,7 @@ namespace RegionOrebroLan.Transforming
 
 		protected internal virtual IEnumerable<string> GetSourcesForTransformation(string path)
 		{
-			var sources = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+			var sources = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
 
 			// ReSharper disable InvertIf
 			if(this.FileSystem.File.Exists(path))
@@ -168,7 +168,7 @@ namespace RegionOrebroLan.Transforming
 		{
 			transformationNames = (transformationNames ?? []).ToArray();
 			var stringComparer = StringComparer.OrdinalIgnoreCase;
-			var transformInformation = new Dictionary<string, IDictionary<string, bool>>(stringComparer);
+			var transformInformation = new SortedDictionary<string, IDictionary<string, bool>>(stringComparer);
 
 			foreach(var mapping in this.GetTransformMap(directoryPath, fileToTransformPatterns))
 			{
