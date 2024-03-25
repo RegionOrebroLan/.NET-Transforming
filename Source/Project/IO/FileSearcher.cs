@@ -14,7 +14,7 @@ namespace RegionOrebroLan.Transforming.IO
 			matcher.AddExcludePatterns(excludePatterns ?? []);
 			matcher.AddIncludePatterns(includePatterns ?? []);
 
-			return matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(directoryPath))).Files.Select(file => file.Path);
+			return matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(directoryPath))).Files.Select(file => file.Path).OrderBy(file => file, StringComparer.OrdinalIgnoreCase);
 		}
 
 		#endregion
