@@ -38,11 +38,6 @@ namespace RegionOrebroLan.Transforming.IO
 			return PathExtension.IsPathFullyQualified(path);
 		}
 
-		public virtual bool IsPathRooted(string path)
-		{
-			return Path.IsPathRooted(path);
-		}
-
 		#endregion
 	}
 }

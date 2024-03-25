@@ -121,7 +121,7 @@ namespace RegionOrebroLan.Transforming
 
 		protected internal virtual IEnumerable<string> GetFilePathsToDelete(string directoryPath, IEnumerable<string> pathToDeletePatterns)
 		{
-			var filePathsToDelete = this.FindFiles("delete", directoryPath, pathToDeletePatterns).Select(match => this.FileSystem.Path.IsPathRooted(match) ? match : this.FileSystem.Path.Combine(directoryPath, match)).ToArray();
+			var filePathsToDelete = this.FindFiles("delete", directoryPath, pathToDeletePatterns).Select(match => this.FileSystem.Path.IsPathFullyQualified(match) ? match : this.FileSystem.Path.Combine(directoryPath, match)).ToArray();
 
 			if(filePathsToDelete.Any(path => this.PathsAreEqual(directoryPath, path)))
 				throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "It is not allowed to delete the directory \"{0}\".", directoryPath));
@@ -203,7 +203,7 @@ namespace RegionOrebroLan.Transforming
 
 			foreach(var path in filePathsInvolvedInTransformation)
 			{
-				var fullPath = this.FileSystem.Path.IsPathRooted(path) ? path : this.FileSystem.Path.Combine(directoryPath, path);
+				var fullPath = this.FileSystem.Path.IsPathFullyQualified(path) ? path : this.FileSystem.Path.Combine(directoryPath, path);
 
 				foreach(var source in this.GetSourcesForTransformation(fullPath))
 				{

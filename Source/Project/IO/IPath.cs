@@ -16,7 +16,6 @@ namespace RegionOrebroLan.Transforming.IO
 		string GetExtension(string path);
 		string GetTempPath();
 		bool IsPathFullyQualified(string path);
-		bool IsPathRooted(string path);
 
 		#endregion
 	}
