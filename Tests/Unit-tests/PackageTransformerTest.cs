@@ -1,7 +1,9 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using RegionOrebroLan.Transforming;
+using RegionOrebroLan.Transforming.Configuration;
 using RegionOrebroLan.Transforming.IO;
 
 namespace UnitTests
@@ -35,7 +37,7 @@ namespace UnitTests
 					fileSystemMock.Setup(fileSystem => fileSystem.Directory).Returns(directoryMock.Object);
 					fileSystemMock.Setup(fileSystem => fileSystem.File).Returns(fileMock.Object);
 
-					_packageTransformer = new PackageTransformer(Mock.Of<IFileSearcher>(), fileSystemMock.Object, Mock.Of<IFileTransformerFactory>(), Mock.Of<ILoggerFactory>(), Mock.Of<IPackageHandlerLoader>());
+					_packageTransformer = new PackageTransformer(Mock.Of<IFileSearcher>(), fileSystemMock.Object, Mock.Of<IFileTransformerFactory>(), Mock.Of<ILoggerFactory>(), Mock.Of<IOptionsMonitor<TransformingOptions>>(), Mock.Of<IPackageHandlerLoader>());
 				}
 				// ReSharper restore InvertIf
 
@@ -51,49 +53,49 @@ namespace UnitTests
 		[ExpectedException(typeof(ArgumentException))]
 		public void Transform_WithSixParameters_IfTheDestinationParameterIsEmpty_ShouldThrowAnArgumentException()
 		{
-			this.ValidateDestinationParameterException<ArgumentException>(() => { this.PackageTransformer.Transform(false, string.Empty, [], [], "Test", []); });
+			this.ValidateDestinationParameterException<ArgumentException>(() => { this.PackageTransformer.Transform(string.Empty, [], [], "Test", []); });
 		}
 
 		[TestMethod]
 		[ExpectedException(typeof(ArgumentNullException))]
 		public void Transform_WithSixParameters_IfTheDestinationParameterIsNull_ShouldThrowAnArgumentNullException()
 		{
-			this.ValidateDestinationParameterException<ArgumentNullException>(() => { this.PackageTransformer.Transform(false, null, [], [], "Test", []); });
+			this.ValidateDestinationParameterException<ArgumentNullException>(() => { this.PackageTransformer.Transform(null, [], [], "Test", []); });
 		}
 
 		[TestMethod]
 		[ExpectedException(typeof(ArgumentException))]
 		public void Transform_WithSixParameters_IfTheDestinationParameterIsWhitespace_ShouldThrowAnArgumentException()
 		{
-			this.ValidateDestinationParameterException<ArgumentException>(() => { this.PackageTransformer.Transform(false, " ", [], [], "Test", []); });
+			this.ValidateDestinationParameterException<ArgumentException>(() => { this.PackageTransformer.Transform(" ", [], [], "Test", []); });
 		}
 
 		[TestMethod]
 		[ExpectedException(typeof(ArgumentException))]
 		public void Transform_WithSixParameters_IfTheSourceParameterDoesNotExistAsFileSystemEntry_ShouldThrowAnArgumentException()
 		{
-			this.ValidateSourceParameterException<ArgumentException>(() => { this.PackageTransformer.Transform(false, "Test", [], [], "Test", []); });
+			this.ValidateSourceParameterException<ArgumentException>(() => { this.PackageTransformer.Transform("Test", [], [], "Test", []); });
 		}
 
 		[TestMethod]
 		[ExpectedException(typeof(ArgumentException))]
 		public void Transform_WithSixParameters_IfTheSourceParameterIsEmpty_ShouldThrowAnArgumentException()
 		{
-			this.ValidateSourceParameterException<ArgumentException>(() => { this.PackageTransformer.Transform(false, "Test", [], [], string.Empty, []); });
+			this.ValidateSourceParameterException<ArgumentException>(() => { this.PackageTransformer.Transform("Test", [], [], string.Empty, []); });
 		}
 
 		[TestMethod]
 		[ExpectedException(typeof(ArgumentNullException))]
 		public void Transform_WithSixParameters_IfTheSourceParameterIsNull_ShouldThrowAnArgumentNullException()
 		{
-			this.ValidateSourceParameterException<ArgumentNullException>(() => { this.PackageTransformer.Transform(false, "Test", [], [], null, []); });
+			this.ValidateSourceParameterException<ArgumentNullException>(() => { this.PackageTransformer.Transform("Test", [], [], null, []); });
 		}
 
 		[TestMethod]
 		[ExpectedException(typeof(ArgumentException))]
 		public void Transform_WithSixParameters_IfTheSourceParameterIsWhitespace_ShouldThrowAnArgumentException()
 		{
-			this.ValidateSourceParameterException<ArgumentException>(() => { this.PackageTransformer.Transform(false, "Test", [], [], " ", []); });
+			this.ValidateSourceParameterException<ArgumentException>(() => { this.PackageTransformer.Transform("Test", [], [], " ", []); });
 		}
 
 		[TestMethod]

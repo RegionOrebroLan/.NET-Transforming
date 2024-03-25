@@ -1,8 +1,9 @@
 using System.Globalization;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using RegionOrebroLan.Transforming.Configuration;
 using RegionOrebroLan.Transforming.IO;
 using RegionOrebroLan.Transforming.IO.Extensions;
-using RegionOrebroLan.Transforming.Runtime;
 
 namespace RegionOrebroLan.Transforming
 {
@@ -10,11 +11,11 @@ namespace RegionOrebroLan.Transforming
 	{
 		#region Constructors
 
-		protected BasicFileTransformer(IFileSystem fileSystem, ILoggerFactory loggerFactory, IPlatform platform)
+		protected BasicFileTransformer(IFileSystem fileSystem, ILoggerFactory loggerFactory, IOptionsMonitor<TransformingOptions> optionsMonitor)
 		{
 			this.FileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
 			this.Logger = (loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory))).CreateLogger(this.GetType());
-			this.Platform = platform ?? throw new ArgumentNullException(nameof(platform));
+			this.OptionsMonitor = optionsMonitor ?? throw new ArgumentNullException(nameof(optionsMonitor));
 		}
 
 		#endregion
@@ -23,21 +24,29 @@ namespace RegionOrebroLan.Transforming
 
 		protected internal virtual IFileSystem FileSystem { get; }
 		protected internal virtual ILogger Logger { get; }
-		protected internal virtual IPlatform Platform { get; }
+		protected internal virtual IOptionsMonitor<TransformingOptions> OptionsMonitor { get; }
 
 		#endregion
 
 		#region Methods
 
-		protected internal virtual bool ResolveAvoidByteOrderMark(bool? avoidByteOrderMark)
+		protected internal virtual string GetContent(FileTransformingOptions options, StreamReader streamReader)
 		{
-			if(avoidByteOrderMark == null)
-				return !this.Platform.IsWindows;
+			if(options == null)
+				throw new ArgumentNullException(nameof(options));
 
-			return avoidByteOrderMark.Value;
+			if(streamReader == null)
+				throw new ArgumentNullException(nameof(streamReader));
+
+			var content = streamReader.ReadToEnd();
+
+			if(options.Replacement.Enabled)
+				content = options.Replacement.Replace(content);
+
+			return content;
 		}
 
-		public virtual void Transform(string destination, string source, string transformation, bool? avoidByteOrderMark = null)
+		public virtual void Transform(string destination, string source, string transformation, FileTransformingOptions options = null)
 		{
 			if(destination == null)
 				throw new ArgumentNullException(nameof(destination));
@@ -65,7 +74,7 @@ namespace RegionOrebroLan.Transforming
 
 			try
 			{
-				this.TransformInternal(destination, source, transformation, avoidByteOrderMark);
+				this.TransformInternal(destination, source, transformation, options ?? this.OptionsMonitor.CurrentValue.File);
 			}
 			catch(Exception exception)
 			{
@@ -73,13 +82,16 @@ namespace RegionOrebroLan.Transforming
 			}
 		}
 
-		protected internal abstract void TransformInternal(string destination, string source, string transformation, bool? avoidByteOrderMark = null);
+		protected internal abstract void TransformInternal(string destination, string source, string transformation, FileTransformingOptions options);
 
-		protected internal virtual bool UseByteOrderMark(bool? avoidByteOrderMark, string source)
+		protected internal virtual bool UseByteOrderMark(FileTransformingOptions options, string source)
 		{
+			if(options == null)
+				throw new ArgumentNullException(nameof(options));
+
 			using(var streamReader = new StreamReader(source, true))
 			{
-				return streamReader.HasByteOrderMark() && !this.ResolveAvoidByteOrderMark(avoidByteOrderMark);
+				return streamReader.HasByteOrderMark() && !options.AvoidByteOrderMark;
 			}
 		}
 

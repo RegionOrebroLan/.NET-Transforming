@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RegionOrebroLan.Transforming;
 using RegionOrebroLan.Transforming.IO;
-using RegionOrebroLan.Transforming.Runtime;
 
 namespace IntegrationTests
 {
@@ -30,7 +29,7 @@ namespace IntegrationTests
 					var fileSystem = new FileSystem();
 					var loggerFactory = new NullLoggerFactory();
 
-					_packageTransformer = new PackageTransformer(new FileSearcher(), fileSystem, new FileTransformerFactory(fileSystem, loggerFactory, new Platform()), loggerFactory, new PackageHandlerLoader(fileSystem));
+					_packageTransformer = new PackageTransformer(new FileSearcher(), fileSystem, new FileTransformerFactory(fileSystem, loggerFactory, this.OptionsMonitor), loggerFactory, this.OptionsMonitor, new PackageHandlerLoader(fileSystem));
 				}
 				// ReSharper restore InvertIf
 
@@ -411,7 +410,7 @@ namespace IntegrationTests
 			var source = this.GetTestResourcePath(this.GetRandomPackageName("Package"));
 			var transformationNames = new[] { "Release", "Test" };
 
-			this.PackageTransformer.Transform(true, destination, fileToTransformPatterns, pathToDeletePatterns, source, transformationNames);
+			this.PackageTransformer.Transform(destination, fileToTransformPatterns, pathToDeletePatterns, source, transformationNames);
 
 			if(!Directory.Exists(destination))
 			{
@@ -458,7 +457,7 @@ namespace IntegrationTests
 			var source = this.GetTestResourcePath(this.GetRandomPackageName("Package"));
 			var transformationNames = new[] { "Release", "Test" };
 
-			this.PackageTransformer.Transform(true, destination, fileToTransformPatterns, pathToDeletePatterns, source, transformationNames);
+			this.PackageTransformer.Transform(destination, fileToTransformPatterns, pathToDeletePatterns, source, transformationNames);
 
 			if(!Directory.Exists(destination))
 			{
@@ -484,7 +483,7 @@ namespace IntegrationTests
 			var source = this.GetTestResourcePath(this.GetRandomPackageName("Package"));
 			var transformationNames = new[] { "Release", "Test" };
 
-			this.PackageTransformer.Transform(true, destination, fileToTransformPatterns, pathToDeletePatterns, source, transformationNames);
+			this.PackageTransformer.Transform(destination, fileToTransformPatterns, pathToDeletePatterns, source, transformationNames);
 
 			if(!Directory.Exists(destination))
 			{
@@ -513,7 +512,7 @@ namespace IntegrationTests
 			var source = this.GetTestResourcePath("My.Package");
 			var transformationNames = new[] { "Release", "Test" };
 
-			this.PackageTransformer.Transform(true, destination, fileToTransformPatterns, pathToDeletePatterns, source, transformationNames);
+			this.PackageTransformer.Transform(destination, fileToTransformPatterns, pathToDeletePatterns, source, transformationNames);
 
 			if(!Directory.Exists(destination))
 			{
@@ -539,7 +538,7 @@ namespace IntegrationTests
 			var source = this.GetTestResourcePath("My.Package.With.Multiple.Dots");
 			var transformationNames = new[] { "Release", "Test", "1.2.3.4.5", "AB.CDE.FGHI", "NON.EXISTING.DOT.NAME" };
 
-			this.PackageTransformer.Transform(true, destination, fileToTransformPatterns, pathToDeletePatterns, source, transformationNames);
+			this.PackageTransformer.Transform(destination, fileToTransformPatterns, pathToDeletePatterns, source, transformationNames);
 
 			if(!Directory.Exists(destination))
 			{
@@ -562,7 +561,7 @@ namespace IntegrationTests
 			var destination = this.GetOutputPath(this.GetRandomPackageName("Transformed-Empty-Package"));
 			var source = this.GetTestResourcePath(this.GetRandomPackageName("Empty"));
 
-			this.PackageTransformer.Transform(true, destination, null, null, source, null);
+			this.PackageTransformer.Transform(destination, null, null, source, null);
 
 			if(!Directory.Exists(destination))
 			{
@@ -631,7 +630,7 @@ namespace IntegrationTests
 			var source = this.GetTestResourcePath(this.GetRandomPackageName("Package"));
 			var transformationNames = new[] { "Release", "Test" };
 
-			this.PackageTransformer.Transform(true, destination, fileToTransformPatterns, pathToDeletePatterns, source, transformationNames);
+			this.PackageTransformer.Transform(destination, fileToTransformPatterns, pathToDeletePatterns, source, transformationNames);
 
 			if(!Directory.Exists(destination))
 			{
@@ -656,7 +655,7 @@ namespace IntegrationTests
 			var source = this.GetTestResourcePath(this.GetRandomPackageName("Alphabetical-Test"));
 			var transformationNames = new[] { "C", "A", "B" };
 
-			this.PackageTransformer.Transform(true, destination, fileToTransformPatterns, null, source, transformationNames);
+			this.PackageTransformer.Transform(destination, fileToTransformPatterns, null, source, transformationNames);
 
 			if(!Directory.Exists(destination))
 			{
@@ -794,12 +793,12 @@ namespace IntegrationTests
 
 		protected internal virtual void ValidateTransformDestinationParameterException<T>(string destination) where T : ArgumentException
 		{
-			this.ValidateDestinationParameterException<T>(() => { this.PackageTransformer.Transform(true, destination, null, null, this.GetTestResourcePath("Empty-directory"), null); });
+			this.ValidateDestinationParameterException<T>(() => { this.PackageTransformer.Transform(destination, null, null, this.GetTestResourcePath("Empty-directory"), null); });
 		}
 
 		protected internal virtual void ValidateTransformSourceParameterException<T>(string source) where T : ArgumentException
 		{
-			this.ValidateSourceParameterException<T>(() => { this.PackageTransformer.Transform(true, this.GetOutputPath("Transformed-directory"), null, null, source, null); });
+			this.ValidateSourceParameterException<T>(() => { this.PackageTransformer.Transform(this.GetOutputPath("Transformed-directory"), null, null, source, null); });
 		}
 
 		#endregion

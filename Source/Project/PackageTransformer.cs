@@ -1,5 +1,7 @@
 using System.Globalization;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using RegionOrebroLan.Transforming.Configuration;
 using RegionOrebroLan.Transforming.IO;
 using RegionOrebroLan.Transforming.IO.Extensions;
 
@@ -15,12 +17,13 @@ namespace RegionOrebroLan.Transforming
 
 		#region Constructors
 
-		public PackageTransformer(IFileSearcher fileSearcher, IFileSystem fileSystem, IFileTransformerFactory fileTransformerFactory, ILoggerFactory loggerFactory, IPackageHandlerLoader packageHandlerLoader)
+		public PackageTransformer(IFileSearcher fileSearcher, IFileSystem fileSystem, IFileTransformerFactory fileTransformerFactory, ILoggerFactory loggerFactory, IOptionsMonitor<TransformingOptions> optionsMonitor, IPackageHandlerLoader packageHandlerLoader)
 		{
 			this.FileSearcher = fileSearcher ?? throw new ArgumentNullException(nameof(fileSearcher));
 			this.FileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
 			this.FileTransformerFactory = fileTransformerFactory ?? throw new ArgumentNullException(nameof(fileTransformerFactory));
 			this.Logger = (loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory))).CreateLogger(this.GetType());
+			this.OptionsMonitor = optionsMonitor ?? throw new ArgumentNullException(nameof(optionsMonitor));
 			this.PackageHandlerLoader = packageHandlerLoader ?? throw new ArgumentNullException(nameof(packageHandlerLoader));
 		}
 
@@ -32,6 +35,7 @@ namespace RegionOrebroLan.Transforming
 		protected internal virtual IFileSystem FileSystem { get; }
 		protected internal virtual IFileTransformerFactory FileTransformerFactory { get; }
 		protected internal virtual ILogger Logger { get; }
+		protected internal virtual IOptionsMonitor<TransformingOptions> OptionsMonitor { get; }
 		protected internal virtual IPackageHandlerLoader PackageHandlerLoader { get; }
 		protected internal virtual IEnumerable<char> PathPatternSeparators => _pathPatternSeparators;
 
@@ -230,7 +234,7 @@ namespace RegionOrebroLan.Transforming
 			return string.Equals(this.NormalizePath(firstPath), this.NormalizePath(secondPath), StringComparison.OrdinalIgnoreCase);
 		}
 
-		protected internal virtual void Transform(string directoryPath, IEnumerable<string> fileToTransformPatterns, IEnumerable<string> transformationNames, bool? avoidByteOrderMark = null)
+		protected internal virtual void Transform(string directoryPath, IEnumerable<string> fileToTransformPatterns, IEnumerable<string> transformationNames, TransformingOptions options)
 		{
 			foreach(var item in this.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames))
 			{
@@ -240,14 +244,14 @@ namespace RegionOrebroLan.Transforming
 						continue;
 
 					if(transformFileInformation.Value)
-						this.FileTransformerFactory.Create(item.Key).Transform(item.Key, item.Key, transformFileInformation.Key, avoidByteOrderMark);
+						this.FileTransformerFactory.Create(item.Key).Transform(item.Key, item.Key, transformFileInformation.Key, options.File);
 
 					this.FileSystem.File.Delete(transformFileInformation.Key);
 				}
 			}
 		}
 
-		public void Transform(bool cleanup, string destination, IEnumerable<string> fileToTransformPatterns, IEnumerable<string> pathToDeletePatterns, string source, IEnumerable<string> transformationNames, bool? avoidByteOrderMark = null)
+		public void Transform(string destination, IEnumerable<string> fileToTransformPatterns, IEnumerable<string> pathToDeletePatterns, string source, IEnumerable<string> transformationNames, TransformingOptions options = null)
 		{
 			if(destination == null)
 				throw new ArgumentNullException(nameof(destination));
@@ -289,16 +293,19 @@ namespace RegionOrebroLan.Transforming
 				throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "The source \"{0}\" is invalid.", source), nameof(source), exception);
 			}
 
-			this.TransformInternal(cleanup, destination, fileToTransformPatterns, packageExtractor, packageWriter, pathToDeletePatterns, source, transformationNames, avoidByteOrderMark);
+			this.TransformInternal(destination, fileToTransformPatterns, packageExtractor, packageWriter, pathToDeletePatterns, source, transformationNames, options ?? this.OptionsMonitor.CurrentValue);
 		}
 
-		protected internal virtual void TransformInternal(bool cleanup, string destination, IEnumerable<string> fileToTransformPatterns, IPackageExtractor packageExtractor, IPackageWriter packageWriter, IEnumerable<string> pathToDeletePatterns, string source, IEnumerable<string> transformationNames, bool? avoidByteOrderMark = null)
+		protected internal virtual void TransformInternal(string destination, IEnumerable<string> fileToTransformPatterns, IPackageExtractor packageExtractor, IPackageWriter packageWriter, IEnumerable<string> pathToDeletePatterns, string source, IEnumerable<string> transformationNames, TransformingOptions options)
 		{
 			if(packageExtractor == null)
 				throw new ArgumentNullException(nameof(packageExtractor));
 
 			if(packageWriter == null)
 				throw new ArgumentNullException(nameof(packageWriter));
+
+			if(options == null)
+				throw new ArgumentNullException(nameof(options));
 
 			var temporaryDirectoryPath = this.FileSystem.Path.Combine(this.FileSystem.Path.GetTempPath(), Guid.NewGuid().ToString());
 
@@ -312,7 +319,7 @@ namespace RegionOrebroLan.Transforming
 
 				this.FileSystem.CopyDirectory(temporaryTransformDirectoryPath, temporaryOriginalDirectoryPath);
 
-				this.Transform(temporaryTransformDirectoryPath, fileToTransformPatterns, transformationNames, avoidByteOrderMark);
+				this.Transform(temporaryTransformDirectoryPath, fileToTransformPatterns, transformationNames, options);
 
 				this.DeleteItems(temporaryTransformDirectoryPath, pathToDeletePatterns);
 
@@ -320,7 +327,7 @@ namespace RegionOrebroLan.Transforming
 			}
 			finally
 			{
-				if(cleanup && this.FileSystem.Directory.Exists(temporaryDirectoryPath))
+				if(options.Package.Cleanup && this.FileSystem.Directory.Exists(temporaryDirectoryPath))
 					this.FileSystem.Directory.Delete(temporaryDirectoryPath, true);
 			}
 		}

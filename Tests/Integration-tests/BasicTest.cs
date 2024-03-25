@@ -1,4 +1,7 @@
+using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using RegionOrebroLan.Transforming.Configuration;
 
 namespace IntegrationTests
 {
@@ -6,6 +9,7 @@ namespace IntegrationTests
 	{
 		#region Fields
 
+		private static IOptionsMonitor<TransformingOptions> _optionsMonitor;
 		private DirectoryInfo _outputDirectory;
 		private static readonly string _outputDirectoryPath = Path.Combine(Global.ProjectDirectory.FullName, "Transform-output");
 		private DirectoryInfo _testResourceDirectory;
@@ -13,6 +17,23 @@ namespace IntegrationTests
 		#endregion
 
 		#region Properties
+
+		protected internal virtual IOptionsMonitor<TransformingOptions> OptionsMonitor
+		{
+			get
+			{
+				if(_optionsMonitor == null)
+				{
+					var options = new TransformingOptions();
+					var optionsMonitorMock = new Mock<IOptionsMonitor<TransformingOptions>>();
+					optionsMonitorMock.Setup(optionsMonitor => optionsMonitor.CurrentValue).Returns(options);
+					optionsMonitorMock.Setup(optionsMonitor => optionsMonitor.Get(It.IsAny<string>())).Returns(options);
+					_optionsMonitor = optionsMonitorMock.Object;
+				}
+
+				return _optionsMonitor;
+			}
+		}
 
 		protected internal virtual DirectoryInfo OutputDirectory
 		{

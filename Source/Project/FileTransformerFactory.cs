@@ -1,8 +1,9 @@
 using System.Globalization;
 using System.Xml;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using RegionOrebroLan.Transforming.Configuration;
 using RegionOrebroLan.Transforming.IO;
-using RegionOrebroLan.Transforming.Runtime;
 
 namespace RegionOrebroLan.Transforming
 {
@@ -10,12 +11,12 @@ namespace RegionOrebroLan.Transforming
 	{
 		#region Constructors
 
-		public FileTransformerFactory(IFileSystem fileSystem, ILoggerFactory loggerFactory, IPlatform platform)
+		public FileTransformerFactory(IFileSystem fileSystem, ILoggerFactory loggerFactory, IOptionsMonitor<TransformingOptions> optionsMonitor)
 		{
 			this.FileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
 			this.LoggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
 			this.Logger = loggerFactory.CreateLogger(this.GetType());
-			this.Platform = platform ?? throw new ArgumentNullException(nameof(platform));
+			this.OptionsMonitor = optionsMonitor ?? throw new ArgumentNullException(nameof(optionsMonitor));
 		}
 
 		#endregion
@@ -25,7 +26,7 @@ namespace RegionOrebroLan.Transforming
 		protected internal virtual IFileSystem FileSystem { get; }
 		protected internal virtual ILogger Logger { get; }
 		protected internal virtual ILoggerFactory LoggerFactory { get; }
-		protected internal virtual IPlatform Platform { get; }
+		protected internal virtual IOptionsMonitor<TransformingOptions> OptionsMonitor { get; }
 
 		#endregion
 
@@ -43,10 +44,10 @@ namespace RegionOrebroLan.Transforming
 				throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "The source \"{0}\" does not exist.", source), nameof(source));
 
 			if(this.IsJsonFile(source))
-				return new JsonTransformer(this.FileSystem, this.LoggerFactory, this.Platform);
+				return new JsonTransformer(this.FileSystem, this.LoggerFactory, this.OptionsMonitor);
 
 			if(this.IsXmlFile(source))
-				return new XmlTransformer(this.FileSystem, this.LoggerFactory, this.Platform);
+				return new XmlTransformer(this.FileSystem, this.LoggerFactory, this.OptionsMonitor);
 
 			throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "A transformer for file \"{0}\" could not be created.", source));
 		}

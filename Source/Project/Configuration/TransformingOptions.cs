@@ -1,4 +1,4 @@
-﻿namespace RegionOrebroLan.Transforming.Configuration
+namespace RegionOrebroLan.Transforming.Configuration
 {
 	public class TransformingOptions
 	{
