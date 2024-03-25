@@ -19,6 +19,16 @@ namespace RegionOrebroLan.Transforming.IO
 			return File.Exists(path);
 		}
 
+		public virtual string ReadAllText(string path)
+		{
+			return File.ReadAllText(path);
+		}
+
+		public virtual void WriteAllText(string path, string content)
+		{
+			File.WriteAllText(path, content);
+		}
+
 		#endregion
 	}
 }

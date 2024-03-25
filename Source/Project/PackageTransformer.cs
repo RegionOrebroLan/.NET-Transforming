@@ -234,6 +234,21 @@ namespace RegionOrebroLan.Transforming
 			return string.Equals(this.NormalizePath(firstPath), this.NormalizePath(secondPath), StringComparison.OrdinalIgnoreCase);
 		}
 
+		protected internal virtual void ReplaceFileContentIfNecessary(TransformingOptions options, string source)
+		{
+			if(!options.File.Replacement.Enabled)
+				return;
+
+			foreach(var path in this.FileSystem.Directory.GetFilesRecursive(source))
+			{
+				var content = this.FileSystem.File.ReadAllText(path);
+				var replaced = options.File.Replacement.Replace(content);
+
+				if(content != replaced)
+					this.FileSystem.File.WriteAllText(path, replaced);
+			}
+		}
+
 		protected internal virtual void Transform(string directoryPath, IEnumerable<string> fileToTransformPatterns, IEnumerable<string> transformationNames, TransformingOptions options)
 		{
 			foreach(var item in this.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames))
@@ -322,6 +337,8 @@ namespace RegionOrebroLan.Transforming
 				this.Transform(temporaryTransformDirectoryPath, fileToTransformPatterns, transformationNames, options);
 
 				this.DeleteItems(temporaryTransformDirectoryPath, pathToDeletePatterns);
+
+				this.ReplaceFileContentIfNecessary(options, temporaryTransformDirectoryPath);
 
 				packageWriter.Write(destination, temporaryTransformDirectoryPath);
 			}

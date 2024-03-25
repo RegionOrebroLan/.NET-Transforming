@@ -19,11 +19,6 @@ namespace RegionOrebroLan.Transforming.IO
 			Directory.Delete(path, recursive);
 		}
 
-		public virtual IEnumerable<string> EnumerateFileSystemEntries(string path)
-		{
-			return Directory.EnumerateFileSystemEntries(path);
-		}
-
 		public virtual bool Exists(string path)
 		{
 			return Directory.Exists(path);
@@ -37,6 +32,11 @@ namespace RegionOrebroLan.Transforming.IO
 		public virtual IEnumerable<string> GetFiles(string path)
 		{
 			return Directory.GetFiles(path);
+		}
+
+		public virtual IEnumerable<string> GetFilesRecursive(string path)
+		{
+			return Directory.GetFiles(path, "*", SearchOption.AllDirectories);
 		}
 
 		#endregion
