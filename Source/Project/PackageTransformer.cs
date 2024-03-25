@@ -121,7 +121,7 @@ namespace RegionOrebroLan.Transforming
 
 		protected internal virtual IEnumerable<string> GetFilePathsToDelete(string directoryPath, IEnumerable<string> pathToDeletePatterns)
 		{
-			var filePathsToDelete = this.FindFiles("delete", directoryPath, pathToDeletePatterns).Select(match => this.FileSystem.Path.IsPathFullyQualified(match) ? match : this.FileSystem.Path.Combine(directoryPath, match)).ToArray();
+			var filePathsToDelete = this.FindFiles("delete", directoryPath, pathToDeletePatterns).Select(match => this.FileSystem.Path.IsAbsolutePath(match) ? match : this.FileSystem.Path.Combine(directoryPath, match)).ToArray();
 
 			if(filePathsToDelete.Any(path => this.PathsAreEqual(directoryPath, path)))
 				throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "It is not allowed to delete the directory \"{0}\".", directoryPath));
@@ -203,7 +203,7 @@ namespace RegionOrebroLan.Transforming
 
 			foreach(var path in filePathsInvolvedInTransformation)
 			{
-				var fullPath = this.FileSystem.Path.IsPathFullyQualified(path) ? path : this.FileSystem.Path.Combine(directoryPath, path);
+				var fullPath = this.FileSystem.Path.IsAbsolutePath(path) ? path : this.FileSystem.Path.Combine(directoryPath, path);
 
 				foreach(var source in this.GetSourcesForTransformation(fullPath))
 				{
@@ -331,13 +331,13 @@ namespace RegionOrebroLan.Transforming
 				return;
 
 			// If the file-path is a relative path.
-			if(!this.FileSystem.Path.IsPathFullyQualified(filePath))
+			if(!this.FileSystem.Path.IsAbsolutePath(filePath))
 				return;
 
 			if(directoryPath == null)
 				throw new ArgumentNullException(nameof(directoryPath));
 
-			if(!this.FileSystem.Path.IsPathFullyQualified(directoryPath))
+			if(!this.FileSystem.Path.IsAbsolutePath(directoryPath))
 				throw new ArgumentException($"The directory-path can not be relative ({directoryPath}).", nameof(directoryPath));
 
 			// We are not allowed to delete files outside the directory-path.

@@ -33,7 +33,7 @@ namespace RegionOrebroLan.Transforming.IO
 			return Path.GetTempPath();
 		}
 
-		public virtual bool IsPathFullyQualified(string path)
+		public virtual bool IsAbsolutePath(string path)
 		{
 			return PathExtension.IsPathFullyQualified(path);
 		}
