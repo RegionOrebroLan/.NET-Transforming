@@ -1,6 +1,6 @@
-﻿namespace RegionOrebroLan.Transforming.Configuration
+namespace RegionOrebroLan.Transforming.Configuration
 {
-	public class PackageTransformingOptions : FileTransformingOptions
+	public class PackageTransformingOptions
 	{
 		#region Properties
 
