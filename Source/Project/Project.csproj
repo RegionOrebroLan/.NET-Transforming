@@ -13,7 +13,7 @@
 		<PackageTags>directory-transform file-transform jdt json json-transform package package-transform transformation transforms xdt xml xml-transform zipfile-transform</PackageTags>
 		<RootNamespace>$(AssemblyName)</RootNamespace>
 		<TargetFramework>netstandard2.0</TargetFramework>
-		<VersionPrefix>2.2.0</VersionPrefix>
+		<VersionPrefix>3.0.0</VersionPrefix>
 		<VersionSuffix></VersionSuffix>
 	</PropertyGroup>
 	<ItemGroup>
