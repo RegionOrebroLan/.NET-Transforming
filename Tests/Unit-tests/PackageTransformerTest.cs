@@ -48,43 +48,43 @@ namespace UnitTests
 		#region Methods
 
 		[Fact]
-		public void Transform_WithSixParameters_IfTheDestinationParameterIsEmpty_ShouldThrowAnArgumentException()
+		public void Transform_IfTheDestinationParameterIsEmpty_ShouldThrowAnArgumentException()
 		{
 			Assert.Throws<ArgumentException>("destination", () => this.PackageTransformer.Transform(string.Empty, [], [], "Test", []));
 		}
 
 		[Fact]
-		public void Transform_WithSixParameters_IfTheDestinationParameterIsNull_ShouldThrowAnArgumentNullException()
+		public void Transform_IfTheDestinationParameterIsNull_ShouldThrowAnArgumentNullException()
 		{
 			Assert.Throws<ArgumentNullException>("destination", () => this.PackageTransformer.Transform(null, [], [], "Test", []));
 		}
 
 		[Fact]
-		public void Transform_WithSixParameters_IfTheDestinationParameterIsWhitespace_ShouldThrowAnArgumentException()
+		public void Transform_IfTheDestinationParameterIsWhitespace_ShouldThrowAnArgumentException()
 		{
 			Assert.Throws<ArgumentException>("destination", () => this.PackageTransformer.Transform(" ", [], [], "Test", []));
 		}
 
 		[Fact]
-		public void Transform_WithSixParameters_IfTheSourceParameterDoesNotExistAsFileSystemEntry_ShouldThrowAnArgumentException()
+		public void Transform_IfTheSourceParameterDoesNotExistAsFileSystemEntry_ShouldThrowAnArgumentException()
 		{
 			Assert.Throws<ArgumentException>("source", () => this.PackageTransformer.Transform("Test", [], [], "Test", []));
 		}
 
 		[Fact]
-		public void Transform_WithSixParameters_IfTheSourceParameterIsEmpty_ShouldThrowAnArgumentException()
+		public void Transform_IfTheSourceParameterIsEmpty_ShouldThrowAnArgumentException()
 		{
 			Assert.Throws<ArgumentException>("source", () => this.PackageTransformer.Transform("Test", [], [], string.Empty, []));
 		}
 
 		[Fact]
-		public void Transform_WithSixParameters_IfTheSourceParameterIsNull_ShouldThrowAnArgumentNullException()
+		public void Transform_IfTheSourceParameterIsNull_ShouldThrowAnArgumentNullException()
 		{
 			Assert.Throws<ArgumentNullException>("source", () => this.PackageTransformer.Transform("Test", [], [], null, []));
 		}
 
 		[Fact]
-		public void Transform_WithSixParameters_IfTheSourceParameterIsWhitespace_ShouldThrowAnArgumentException()
+		public void Transform_IfTheSourceParameterIsWhitespace_ShouldThrowAnArgumentException()
 		{
 			Assert.Throws<ArgumentException>("source", () => this.PackageTransformer.Transform("Test", [], [], " ", []));
 		}
