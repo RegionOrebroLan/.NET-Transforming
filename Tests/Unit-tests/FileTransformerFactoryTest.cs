@@ -11,13 +11,7 @@ namespace UnitTests
 	{
 		#region Fields
 
-		private static FileTransformerFactory _fileTransformerFactory;
-
-		#endregion
-
-		#region Properties
-
-		protected internal virtual FileTransformerFactory FileTransformerFactory => _fileTransformerFactory ??= new FileTransformerFactory(Mock.Of<IFileSystem>(), Mock.Of<ILoggerFactory>(), Mock.Of<IOptionsMonitor<TransformingOptions>>());
+		private static readonly FileTransformerFactory _fileTransformerFactory = new(Mock.Of<IFileSystem>(), Mock.Of<ILoggerFactory>(), Mock.Of<IOptionsMonitor<TransformingOptions>>());
 
 		#endregion
 
@@ -26,19 +20,19 @@ namespace UnitTests
 		[Fact]
 		public void Create_IfTheSourceParameterIsEmpty_ShouldThrowAnArgumentException()
 		{
-			Assert.Throws<ArgumentException>("source", () => this.FileTransformerFactory.Create(string.Empty));
+			Assert.Throws<ArgumentException>("source", () => _fileTransformerFactory.Create(string.Empty));
 		}
 
 		[Fact]
 		public void Create_IfTheSourceParameterIsNull_ShouldThrowAnArgumentNullException()
 		{
-			Assert.Throws<ArgumentNullException>("source", () => this.FileTransformerFactory.Create(null));
+			Assert.Throws<ArgumentNullException>("source", () => _fileTransformerFactory.Create(null));
 		}
 
 		[Fact]
 		public void Create_IfTheSourceParameterIsWhitespace_ShouldThrowAnArgumentException()
 		{
-			Assert.Throws<ArgumentException>("source", () => this.FileTransformerFactory.Create(" "));
+			Assert.Throws<ArgumentException>("source", () => _fileTransformerFactory.Create(" "));
 		}
 
 		#endregion

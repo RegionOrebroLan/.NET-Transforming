@@ -11,82 +11,68 @@ namespace UnitTests
 	{
 		#region Fields
 
-		private static PackageTransformer _packageTransformer;
-
-		#endregion
-
-		#region Properties
-
-		protected internal virtual PackageTransformer PackageTransformer
-		{
-			get
-			{
-				// ReSharper disable InvertIf
-				if(_packageTransformer == null)
-				{
-					var fileSystemMock = new Mock<IFileSystem>();
-
-					var directoryMock = new Mock<IDirectory>();
-					directoryMock.Setup(directory => directory.Exists(It.IsAny<string>())).Returns(false);
-
-					var fileMock = new Mock<IFile>();
-					fileMock.Setup(file => file.Exists(It.IsAny<string>())).Returns(false);
-
-					fileSystemMock.Setup(fileSystem => fileSystem.Directory).Returns(directoryMock.Object);
-					fileSystemMock.Setup(fileSystem => fileSystem.File).Returns(fileMock.Object);
-
-					_packageTransformer = new PackageTransformer(Mock.Of<IFileSearcher>(), fileSystemMock.Object, Mock.Of<IFileTransformerFactory>(), Mock.Of<ILoggerFactory>(), Mock.Of<IOptionsMonitor<TransformingOptions>>(), Mock.Of<IPackageHandlerLoader>());
-				}
-				// ReSharper restore InvertIf
-
-				return _packageTransformer;
-			}
-		}
+		private static readonly PackageTransformer _packageTransformer = CreatePackageTransformer();
 
 		#endregion
 
 		#region Methods
 
+		private static PackageTransformer CreatePackageTransformer()
+		{
+			var fileSystemMock = new Mock<IFileSystem>();
+
+			var directoryMock = new Mock<IDirectory>();
+			directoryMock.Setup(directory => directory.Exists(It.IsAny<string>())).Returns(false);
+
+			var fileMock = new Mock<IFile>();
+			fileMock.Setup(file => file.Exists(It.IsAny<string>())).Returns(false);
+
+			fileSystemMock.Setup(fileSystem => fileSystem.Directory).Returns(directoryMock.Object);
+			fileSystemMock.Setup(fileSystem => fileSystem.File).Returns(fileMock.Object);
+
+			return new PackageTransformer(Mock.Of<IFileSearcher>(), fileSystemMock.Object, Mock.Of<IFileTransformerFactory>(), Mock.Of<ILoggerFactory>(), Mock.Of<IOptionsMonitor<TransformingOptions>>(), Mock.Of<IPackageHandlerLoader>());
+		}
+
 		[Fact]
 		public void Transform_IfTheDestinationParameterIsEmpty_ShouldThrowAnArgumentException()
 		{
-			Assert.Throws<ArgumentException>("destination", () => this.PackageTransformer.Transform(string.Empty, [], [], "Test", []));
+			Assert.Throws<ArgumentException>("destination", () => _packageTransformer.Transform(string.Empty, [], [], "Test", []));
 		}
 
 		[Fact]
 		public void Transform_IfTheDestinationParameterIsNull_ShouldThrowAnArgumentNullException()
 		{
-			Assert.Throws<ArgumentNullException>("destination", () => this.PackageTransformer.Transform(null, [], [], "Test", []));
+			Assert.Throws<ArgumentNullException>("destination", () => _packageTransformer.Transform(null, [], [], "Test", []));
 		}
 
 		[Fact]
 		public void Transform_IfTheDestinationParameterIsWhitespace_ShouldThrowAnArgumentException()
 		{
-			Assert.Throws<ArgumentException>("destination", () => this.PackageTransformer.Transform(" ", [], [], "Test", []));
+			Assert.Throws<ArgumentException>("destination", () => _packageTransformer.Transform(" ", [], [], "Test", []));
 		}
 
 		[Fact]
 		public void Transform_IfTheSourceParameterDoesNotExistAsFileSystemEntry_ShouldThrowAnArgumentException()
 		{
-			Assert.Throws<ArgumentException>("source", () => this.PackageTransformer.Transform("Test", [], [], "Test", []));
+			Assert.Throws<ArgumentException>("source", () => _packageTransformer.Transform("Test", [], [], "Test", []));
 		}
 
 		[Fact]
 		public void Transform_IfTheSourceParameterIsEmpty_ShouldThrowAnArgumentException()
 		{
-			Assert.Throws<ArgumentException>("source", () => this.PackageTransformer.Transform("Test", [], [], string.Empty, []));
+			Assert.Throws<ArgumentException>("source", () => _packageTransformer.Transform("Test", [], [], string.Empty, []));
 		}
 
 		[Fact]
 		public void Transform_IfTheSourceParameterIsNull_ShouldThrowAnArgumentNullException()
 		{
-			Assert.Throws<ArgumentNullException>("source", () => this.PackageTransformer.Transform("Test", [], [], null, []));
+			Assert.Throws<ArgumentNullException>("source", () => _packageTransformer.Transform("Test", [], [], null, []));
 		}
 
 		[Fact]
 		public void Transform_IfTheSourceParameterIsWhitespace_ShouldThrowAnArgumentException()
 		{
-			Assert.Throws<ArgumentException>("source", () => this.PackageTransformer.Transform("Test", [], [], " ", []));
+			Assert.Throws<ArgumentException>("source", () => _packageTransformer.Transform("Test", [], [], " ", []));
 		}
 
 		[Fact]
@@ -94,7 +80,7 @@ namespace UnitTests
 		{
 			await Task.CompletedTask;
 
-			this.PackageTransformer.ValidateFilePath(null, null, null);
+			_packageTransformer.ValidateFilePath(null, null, null);
 		}
 
 		[Fact]
@@ -119,7 +105,7 @@ namespace UnitTests
 		{
 			await Task.CompletedTask;
 
-			this.PackageTransformer.ValidateFilePath(null, null, filePath);
+			_packageTransformer.ValidateFilePath(null, null, filePath);
 		}
 
 		#endregion
