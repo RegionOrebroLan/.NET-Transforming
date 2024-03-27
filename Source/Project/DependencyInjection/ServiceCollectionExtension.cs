@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RegionOrebroLan.Transforming.Configuration;
+using RegionOrebroLan.Transforming.IO;
 
 namespace RegionOrebroLan.Transforming.DependencyInjection
 {
@@ -47,12 +48,16 @@ namespace RegionOrebroLan.Transforming.DependencyInjection
 			return services;
 		}
 
-		private static IServiceCollection AddTransformingInternal(this IServiceCollection services)
+		private static void AddTransformingInternal(this IServiceCollection services)
 		{
 			if(services == null)
 				throw new ArgumentNullException(nameof(services));
 
-			return services;
+			services.AddSingleton<IFileSearcher, FileSearcher>();
+			services.AddSingleton<IFileSystem, FileSystem>();
+			services.AddSingleton<IFileTransformerFactory, FileTransformerFactory>();
+			services.AddSingleton<IPackageHandlerLoader, PackageHandlerLoader>();
+			services.AddSingleton<IPackageTransformer, PackageTransformer>();
 		}
 
 		#endregion
