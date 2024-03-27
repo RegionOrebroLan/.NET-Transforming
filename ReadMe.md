@@ -102,3 +102,7 @@ This parameter controls the result of the transformation. If a source file that 
 ### 2.1 Signing
 
 Drop the "StrongName.snk" file in the repository-root. The file should not be included in source control.
+
+## 3 Notes
+
+- [TestMethod, TestInitialize, and TestCleanup in XUnit2](https://blog.somewhatabstract.com/2016/11/21/testmethod-testinitialize-and-testcleanup-in-xunit2)
