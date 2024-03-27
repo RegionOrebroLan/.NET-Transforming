@@ -4,7 +4,7 @@ namespace IntegrationTests
 	{
 		#region Properties
 
-		protected internal override string ProjectRelativeTestResourceDirectoryPath => "Resources";
+		protected internal override string ProjectRelativeTestResourceDirectoryPath => Path.Combine("Resources", "_old");
 
 		#endregion
 	}
