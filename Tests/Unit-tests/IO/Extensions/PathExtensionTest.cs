@@ -1,6 +1,5 @@
 using System.Runtime.InteropServices;
 using RegionOrebroLan.Transforming.IO.Extensions;
-using Xunit;
 
 namespace UnitTests.IO.Extensions
 {

@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using RegionOrebroLan.Transforming;
 using RegionOrebroLan.Transforming.Configuration;
@@ -8,7 +7,6 @@ using RegionOrebroLan.Transforming.IO;
 
 namespace UnitTests
 {
-	[TestClass]
 	public class FileTransformerFactoryTest
 	{
 		#region Fields
@@ -25,25 +23,22 @@ namespace UnitTests
 
 		#region Methods
 
-		[TestMethod]
-		[ExpectedException(typeof(ArgumentException))]
+		[Fact]
 		public void Create_IfTheSourceParameterIsEmpty_ShouldThrowAnArgumentException()
 		{
-			this.FileTransformerFactory.Create(string.Empty);
+			Assert.Throws<ArgumentException>("source", () => this.FileTransformerFactory.Create(string.Empty));
 		}
 
-		[TestMethod]
-		[ExpectedException(typeof(ArgumentNullException))]
+		[Fact]
 		public void Create_IfTheSourceParameterIsNull_ShouldThrowAnArgumentNullException()
 		{
-			this.FileTransformerFactory.Create(null);
+			Assert.Throws<ArgumentNullException>("source", () => this.FileTransformerFactory.Create(null));
 		}
 
-		[TestMethod]
-		[ExpectedException(typeof(ArgumentException))]
+		[Fact]
 		public void Create_IfTheSourceParameterIsWhitespace_ShouldThrowAnArgumentException()
 		{
-			this.FileTransformerFactory.Create(" ");
+			Assert.Throws<ArgumentException>("source", () => this.FileTransformerFactory.Create(" "));
 		}
 
 		#endregion

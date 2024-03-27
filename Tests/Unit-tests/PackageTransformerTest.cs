@@ -1,15 +1,12 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using RegionOrebroLan.Transforming;
 using RegionOrebroLan.Transforming.Configuration;
 using RegionOrebroLan.Transforming.IO;
-using UnitTests.Helpers;
 
 namespace UnitTests
 {
-	[TestClass]
 	public class PackageTransformerTest
 	{
 		#region Fields
@@ -50,56 +47,49 @@ namespace UnitTests
 
 		#region Methods
 
-		[TestMethod]
-		[ExpectedException(typeof(ArgumentException))]
+		[Fact]
 		public void Transform_WithSixParameters_IfTheDestinationParameterIsEmpty_ShouldThrowAnArgumentException()
 		{
-			ExceptionHelper.ValidateDestinationParameterException<ArgumentException>(() => { this.PackageTransformer.Transform(string.Empty, [], [], "Test", []); });
+			Assert.Throws<ArgumentException>("destination", () => this.PackageTransformer.Transform(string.Empty, [], [], "Test", []));
 		}
 
-		[TestMethod]
-		[ExpectedException(typeof(ArgumentNullException))]
+		[Fact]
 		public void Transform_WithSixParameters_IfTheDestinationParameterIsNull_ShouldThrowAnArgumentNullException()
 		{
-			ExceptionHelper.ValidateDestinationParameterException<ArgumentNullException>(() => { this.PackageTransformer.Transform(null, [], [], "Test", []); });
+			Assert.Throws<ArgumentNullException>("destination", () => this.PackageTransformer.Transform(null, [], [], "Test", []));
 		}
 
-		[TestMethod]
-		[ExpectedException(typeof(ArgumentException))]
+		[Fact]
 		public void Transform_WithSixParameters_IfTheDestinationParameterIsWhitespace_ShouldThrowAnArgumentException()
 		{
-			ExceptionHelper.ValidateDestinationParameterException<ArgumentException>(() => { this.PackageTransformer.Transform(" ", [], [], "Test", []); });
+			Assert.Throws<ArgumentException>("destination", () => this.PackageTransformer.Transform(" ", [], [], "Test", []));
 		}
 
-		[TestMethod]
-		[ExpectedException(typeof(ArgumentException))]
+		[Fact]
 		public void Transform_WithSixParameters_IfTheSourceParameterDoesNotExistAsFileSystemEntry_ShouldThrowAnArgumentException()
 		{
-			ExceptionHelper.ValidateSourceParameterException<ArgumentException>(() => { this.PackageTransformer.Transform("Test", [], [], "Test", []); });
+			Assert.Throws<ArgumentException>("source", () => this.PackageTransformer.Transform("Test", [], [], "Test", []));
 		}
 
-		[TestMethod]
-		[ExpectedException(typeof(ArgumentException))]
+		[Fact]
 		public void Transform_WithSixParameters_IfTheSourceParameterIsEmpty_ShouldThrowAnArgumentException()
 		{
-			ExceptionHelper.ValidateSourceParameterException<ArgumentException>(() => { this.PackageTransformer.Transform("Test", [], [], string.Empty, []); });
+			Assert.Throws<ArgumentException>("source", () => this.PackageTransformer.Transform("Test", [], [], string.Empty, []));
 		}
 
-		[TestMethod]
-		[ExpectedException(typeof(ArgumentNullException))]
+		[Fact]
 		public void Transform_WithSixParameters_IfTheSourceParameterIsNull_ShouldThrowAnArgumentNullException()
 		{
-			ExceptionHelper.ValidateSourceParameterException<ArgumentNullException>(() => { this.PackageTransformer.Transform("Test", [], [], null, []); });
+			Assert.Throws<ArgumentNullException>("source", () => this.PackageTransformer.Transform("Test", [], [], null, []));
 		}
 
-		[TestMethod]
-		[ExpectedException(typeof(ArgumentException))]
+		[Fact]
 		public void Transform_WithSixParameters_IfTheSourceParameterIsWhitespace_ShouldThrowAnArgumentException()
 		{
-			ExceptionHelper.ValidateSourceParameterException<ArgumentException>(() => { this.PackageTransformer.Transform("Test", [], [], " ", []); });
+			Assert.Throws<ArgumentException>("source", () => this.PackageTransformer.Transform("Test", [], [], " ", []));
 		}
 
-		[TestMethod]
+		[Fact]
 		public async Task ValidateFilePath_IfAllParametersAreNull_ShouldNotThrowAnException()
 		{
 			await Task.CompletedTask;
@@ -107,19 +97,19 @@ namespace UnitTests
 			this.PackageTransformer.ValidateFilePath(null, null, null);
 		}
 
-		[TestMethod]
+		[Fact]
 		public async Task ValidateFilePath_IfTheFilePathParameterIsAnEmptyString_ShouldNotThrowAnException()
 		{
 			await this.ValidateFilePathShouldNotThrowAnException(string.Empty);
 		}
 
-		[TestMethod]
+		[Fact]
 		public async Task ValidateFilePath_IfTheFilePathParameterIsNull_ShouldNotThrowAnException()
 		{
 			await this.ValidateFilePathShouldNotThrowAnException(null);
 		}
 
-		[TestMethod]
+		[Fact]
 		public async Task ValidateFilePath_IfTheFilePathParameterIsOnlyWhitespaces_ShouldNotThrowAnException()
 		{
 			await this.ValidateFilePathShouldNotThrowAnException("    ");
