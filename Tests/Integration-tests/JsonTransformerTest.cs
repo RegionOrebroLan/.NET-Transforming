@@ -1,4 +1,6 @@
 using IntegrationTests.Fixtures;
+using IntegrationTests.Helpers;
+using RegionOrebroLan.Transforming.IO.Extensions;
 using Xunit;
 
 namespace IntegrationTests
@@ -27,6 +29,41 @@ namespace IntegrationTests
 		private static string[] ResolvePaths(params string[] paths)
 		{
 			return new[] { "JsonTransformerTest" }.Concat(paths).ToArray();
+		}
+
+		[Fact]
+		public async Task ResourceFiles_PrerequisiteTest()
+		{
+			foreach(var file in Directory.GetFileSystemEntries(this.GetResourcePath("bom", "crlf"), "*.json"))
+			{
+				await ResourceFilesPrerequisiteTest(file, true, false, true);
+			}
+
+			foreach(var file in Directory.GetFileSystemEntries(this.GetResourcePath("bom", "lf"), "*.json"))
+			{
+				await ResourceFilesPrerequisiteTest(file, true, true, false);
+			}
+
+			foreach(var file in Directory.GetFileSystemEntries(this.GetResourcePath("no-bom", "crlf"), "*.json"))
+			{
+				await ResourceFilesPrerequisiteTest(file, false, false, true);
+			}
+
+			foreach(var file in Directory.GetFileSystemEntries(this.GetResourcePath("no-bom", "lf"), "*.json"))
+			{
+				await ResourceFilesPrerequisiteTest(file, false, true, false);
+			}
+		}
+
+		private static async Task ResourceFilesPrerequisiteTest(string file, bool hasByteOrderMark, bool hasUnixLineBreaks, bool hasWindowsLineBreaks)
+		{
+			using(var streamReader = new StreamReader(file, true))
+			{
+				Assert.Equal(hasByteOrderMark, streamReader.HasByteOrderMark());
+				var content = await streamReader.ReadToEndAsync();
+				Assert.Equal(hasUnixLineBreaks, content.HasUnixLineBreaks());
+				Assert.Equal(hasWindowsLineBreaks, content.HasWindowsLineBreaks());
+			}
 		}
 
 		[Fact]
