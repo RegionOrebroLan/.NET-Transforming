@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using IntegrationTests.Fixtures;
 using IntegrationTests.Helpers;
 using RegionOrebroLan.Transforming.IO.Extensions;
@@ -61,8 +62,16 @@ namespace IntegrationTests
 			{
 				Assert.Equal(hasByteOrderMark, streamReader.HasByteOrderMark());
 				var content = await streamReader.ReadToEndAsync();
-				Assert.Equal(hasUnixLineBreaks, content.HasUnixLineBreaks());
-				Assert.Equal(hasWindowsLineBreaks, content.HasWindowsLineBreaks());
+				if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+				{
+					Assert.Equal(hasUnixLineBreaks, content.HasUnixLineBreaks());
+					Assert.Equal(hasWindowsLineBreaks, content.HasWindowsLineBreaks());
+				}
+				else
+				{
+					Assert.True(content.HasUnixLineBreaks());
+					Assert.False(content.HasWindowsLineBreaks());
+				}
 			}
 		}
 
