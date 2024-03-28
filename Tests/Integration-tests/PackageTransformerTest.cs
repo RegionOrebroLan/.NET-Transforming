@@ -2,7 +2,6 @@ using System.IO.Compression;
 using System.Runtime.InteropServices;
 using IntegrationTests.Fixtures;
 using IntegrationTests.Helpers;
-using Xunit;
 
 namespace IntegrationTests
 {

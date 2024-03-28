@@ -1,14 +1,12 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RegionOrebroLan.Transforming.IO.Extensions;
 
 namespace IntegrationTests.IO.Extensions
 {
-	[TestClass]
 	public class StreamExtensionTest
 	{
 		#region Methods
 
-		[TestMethod]
+		[Fact]
 		public async Task CopyToAndResetPosition_ShouldCopyTo()
 		{
 			await Task.CompletedTask;
@@ -21,19 +19,19 @@ namespace IntegrationTests.IO.Extensions
 					stream.CopyToAndResetPosition(memoryStream);
 					// ReSharper restore MethodHasAsyncOverload
 
-					Assert.AreEqual(stream.Length, memoryStream.Length);
+					Assert.Equal(stream.Length, memoryStream.Length);
 				}
 			}
 		}
 
-		[TestMethod]
+		[Fact]
 		public async Task CopyToAndResetPosition_ShouldResetThePosition()
 		{
 			await Task.CompletedTask;
 
 			using(var stream = CreateMemoryStream())
 			{
-				Assert.AreEqual(0, stream.Position);
+				Assert.Equal(0, stream.Position);
 
 				using(var memoryStream = new MemoryStream())
 				{
@@ -42,11 +40,11 @@ namespace IntegrationTests.IO.Extensions
 					// ReSharper restore MethodHasAsyncOverload
 				}
 
-				Assert.AreEqual(0, stream.Position);
+				Assert.Equal(0, stream.Position);
 			}
 		}
 
-		[TestMethod]
+		[Fact]
 		public async Task CopyToAndResetPositionAsync_ShouldCopyTo()
 		{
 			using(var stream = CreateMemoryStream())
@@ -55,24 +53,24 @@ namespace IntegrationTests.IO.Extensions
 				{
 					await stream.CopyToAndResetPositionAsync(memoryStream);
 
-					Assert.AreEqual(stream.Length, memoryStream.Length);
+					Assert.Equal(stream.Length, memoryStream.Length);
 				}
 			}
 		}
 
-		[TestMethod]
+		[Fact]
 		public async Task CopyToAndResetPositionAsync_ShouldResetThePosition()
 		{
 			using(var stream = CreateMemoryStream())
 			{
-				Assert.AreEqual(0, stream.Position);
+				Assert.Equal(0, stream.Position);
 
 				using(var memoryStream = new MemoryStream())
 				{
 					await stream.CopyToAndResetPositionAsync(memoryStream);
 				}
 
-				Assert.AreEqual(0, stream.Position);
+				Assert.Equal(0, stream.Position);
 			}
 		}
 

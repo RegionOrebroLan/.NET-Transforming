@@ -1,5 +1,3 @@
-using Xunit;
-
 namespace IntegrationTests.Fixtures
 {
 	[CollectionDefinition(Name)]

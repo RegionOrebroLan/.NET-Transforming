@@ -3,7 +3,6 @@ using System.Runtime.InteropServices;
 using IntegrationTests.Fixtures;
 using IntegrationTests.Helpers;
 using RegionOrebroLan.Transforming.IO.Extensions;
-using Xunit;
 
 namespace IntegrationTests
 {

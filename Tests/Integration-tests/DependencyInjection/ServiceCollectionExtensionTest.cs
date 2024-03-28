@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using RegionOrebroLan.Transforming.Configuration;
 using RegionOrebroLan.Transforming.DependencyInjection;
-using Xunit;
 
 namespace IntegrationTests.DependencyInjection
 {

@@ -4,7 +4,6 @@ using IntegrationTests.Fixtures;
 using IntegrationTests.Helpers;
 using RegionOrebroLan.Transforming.Configuration;
 using RegionOrebroLan.Transforming.IO.Extensions;
-using Xunit;
 
 namespace IntegrationTests
 {

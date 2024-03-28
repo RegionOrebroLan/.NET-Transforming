@@ -1,6 +1,5 @@
 using IntegrationTests.Fixtures;
 using RegionOrebroLan.Transforming;
-using Xunit;
 
 namespace IntegrationTests
 {
