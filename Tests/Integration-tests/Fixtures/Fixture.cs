@@ -66,7 +66,20 @@ namespace IntegrationTests.Fixtures
 			lock(_outputDirectoryLock)
 			{
 				if(Directory.Exists(this._outputDirectoryPath))
-					Directory.Delete(this._outputDirectoryPath, true);
+				{
+					for(var i = 0; i < 20; i++)
+					{
+						try
+						{
+							Directory.Delete(this._outputDirectoryPath, true);
+							break;
+						}
+						catch
+						{
+							Thread.Sleep(10);
+						}
+					}
+				}
 			}
 
 			this.ServiceProvider.Dispose();
