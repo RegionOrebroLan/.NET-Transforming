@@ -1,149 +1,64 @@
-using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using RegionOrebroLan.Transforming;
-using RegionOrebroLan.Transforming.IO;
+using IntegrationTests.Fixtures;
+using Xunit;
 
 namespace IntegrationTests
 {
-	[TestClass]
-	public class JsonTransformerTest : BasicTransformingTest
+	[Collection(FixtureCollection.Name)]
+	public class JsonTransformerTest(Fixture fixture)
 	{
 		#region Fields
 
-		private static JsonTransformer _jsonTransformer;
-
-		#endregion
-
-		#region Properties
-
-		protected internal virtual JsonTransformer JsonTransformer => _jsonTransformer ??= new JsonTransformer(new FileSystem(), new NullLoggerFactory(), this.OptionsMonitor);
+		private readonly Fixture _fixture = fixture ?? throw new ArgumentNullException(nameof(fixture));
 
 		#endregion
 
 		#region Methods
 
-		[TestMethod]
-		[ExpectedException(typeof(ArgumentException))]
-		public void Transform_IfTheDestinationParameterIsEmpty_ShouldThrowAnArgumentException()
+		private string GetOutputPath(params string[] paths)
 		{
-			this.ValidateTransformDestinationParameterException<ArgumentException>(string.Empty);
+			return this._fixture.GetOutputPath(ResolvePaths(paths));
 		}
 
-		[TestMethod]
-		[ExpectedException(typeof(ArgumentNullException))]
-		public void Transform_IfTheDestinationParameterIsNull_ShouldThrowAnArgumentException()
+		private string GetResourcePath(params string[] paths)
 		{
-			this.ValidateTransformDestinationParameterException<ArgumentNullException>(null);
+			return this._fixture.GetResourcePath(ResolvePaths(paths));
 		}
 
-		[TestMethod]
-		[ExpectedException(typeof(ArgumentException))]
-		public void Transform_IfTheDestinationParameterIsWhitespace_ShouldThrowAnArgumentException()
+		private static string[] ResolvePaths(params string[] paths)
 		{
-			this.ValidateTransformDestinationParameterException<ArgumentException>(" ");
+			return new[] { "JsonTransformerTest" }.Concat(paths).ToArray();
 		}
 
-		[TestMethod]
-		[ExpectedException(typeof(ArgumentException))]
-		public void Transform_IfTheSourceParameterDoesNotExistAsFile_ShouldThrowAnArgumentException()
-		{
-			this.ValidateTransformSourceParameterException<ArgumentException>(this.GetTestResourcePath("Non-existing-file.txt"));
-		}
-
-		[TestMethod]
-		[ExpectedException(typeof(ArgumentException))]
-		public void Transform_IfTheSourceParameterIsEmpty_ShouldThrowAnArgumentException()
-		{
-			this.ValidateTransformSourceParameterException<ArgumentException>(string.Empty);
-		}
-
-		[TestMethod]
-		[ExpectedException(typeof(ArgumentNullException))]
-		public void Transform_IfTheSourceParameterIsNull_ShouldThrowAnArgumentException()
-		{
-			this.ValidateTransformSourceParameterException<ArgumentNullException>(null);
-		}
-
-		[TestMethod]
-		[ExpectedException(typeof(ArgumentException))]
-		public void Transform_IfTheSourceParameterIsWhitespace_ShouldThrowAnArgumentException()
-		{
-			this.ValidateTransformSourceParameterException<ArgumentException>(" ");
-		}
-
-		[TestMethod]
+		[Fact]
 		public void Transform_IfTheTransformationContentIsEmpty_ShouldTransformCorrectly()
 		{
-			const string fileName = "AppSettings.json";
+			const string fileName = "appsettings.json";
 			var destination = this.GetOutputPath(fileName);
-			var source = this.GetTestResourcePath(fileName);
-			var transformation = this.GetTestResourcePath("AppSettings.No-Transformation.json");
+			var source = this.GetResourcePath(fileName);
+			var transformation = this.GetResourcePath("appsettings.No-Transformation.json");
 
-			this.JsonTransformer.Transform(destination, source, transformation);
+			this._fixture.JsonTransformer.Transform(destination, source, transformation);
 
-			var expectedContent = File.ReadAllText(this.GetTestResourcePath("AppSettings.No-Transformation.Expected.json"));
+			var expectedContent = File.ReadAllText(this.GetResourcePath("appsettings.No-Transformation.Expected.json"));
 			var actualContent = File.ReadAllText(destination);
 
-			Assert.AreEqual(expectedContent, actualContent);
+			Assert.Equal(expectedContent, actualContent);
 		}
 
-		[TestMethod]
-		[ExpectedException(typeof(ArgumentException))]
-		public void Transform_IfTheTransformationParameterDoesNotExistAsFile_ShouldThrowAnArgumentException()
-		{
-			this.ValidateTransformTransformationParameterException<ArgumentException>(this.GetTestResourcePath("Non-existing-file.txt"));
-		}
-
-		[TestMethod]
-		[ExpectedException(typeof(ArgumentException))]
-		public void Transform_IfTheTransformationParameterIsEmpty_ShouldThrowAnArgumentException()
-		{
-			this.ValidateTransformTransformationParameterException<ArgumentException>(string.Empty);
-		}
-
-		[TestMethod]
-		[ExpectedException(typeof(ArgumentNullException))]
-		public void Transform_IfTheTransformationParameterIsNull_ShouldThrowAnArgumentException()
-		{
-			this.ValidateTransformTransformationParameterException<ArgumentNullException>(null);
-		}
-
-		[TestMethod]
-		[ExpectedException(typeof(ArgumentException))]
-		public void Transform_IfTheTransformationParameterIsWhitespace_ShouldThrowAnArgumentException()
-		{
-			this.ValidateTransformTransformationParameterException<ArgumentException>(" ");
-		}
-
-		[TestMethod]
+		[Fact]
 		public void Transform_ShouldTransformCorrectly()
 		{
-			const string fileName = "AppSettings.json";
+			const string fileName = "appsettings.json";
 			var destination = this.GetOutputPath(fileName);
-			var source = this.GetTestResourcePath(fileName);
-			var transformation = this.GetTestResourcePath("AppSettings.Transformation.json");
+			var source = this.GetResourcePath(fileName);
+			var transformation = this.GetResourcePath("appsettings.Transformation.json");
 
-			this.JsonTransformer.Transform(destination, source, transformation);
+			this._fixture.JsonTransformer.Transform(destination, source, transformation);
 
-			var expectedContent = File.ReadAllText(this.GetTestResourcePath("AppSettings.Expected.json"));
+			var expectedContent = File.ReadAllText(this.GetResourcePath("appsettings.Expected.json"));
 			var actualContent = File.ReadAllText(destination);
 
-			Assert.AreEqual(expectedContent, actualContent);
-		}
-
-		protected internal virtual void ValidateTransformDestinationParameterException<T>(string destination) where T : ArgumentException
-		{
-			this.ValidateDestinationParameterException<T>(() => { this.JsonTransformer.Transform(destination, this.GetTestResourcePath("AppSettings.json"), this.GetTestResourcePath("AppSettings.No-Transformation.json")); });
-		}
-
-		protected internal virtual void ValidateTransformSourceParameterException<T>(string source) where T : ArgumentException
-		{
-			this.ValidateSourceParameterException<T>(() => { this.JsonTransformer.Transform(this.GetOutputPath("AppSettings.json"), source, this.GetTestResourcePath("AppSettings.No-Transformation.json")); });
-		}
-
-		protected internal virtual void ValidateTransformTransformationParameterException<T>(string transformation) where T : ArgumentException
-		{
-			this.ValidateTransformationParameterException<T>(() => { this.JsonTransformer.Transform(this.GetOutputPath("AppSettings.json"), this.GetTestResourcePath("AppSettings.json"), transformation); });
+			Assert.Equal(expectedContent, actualContent);
 		}
 
 		#endregion

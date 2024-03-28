@@ -3,6 +3,7 @@
 dotnet_diagnostic.CA1307.severity = none
 dotnet_diagnostic.CA1510.severity = none # Can not be fixed for net462, net5.0 and netcoreapp3.1
 dotnet_diagnostic.CA1707.severity = none
+dotnet_diagnostic.CA1711.severity = none
 dotnet_diagnostic.CA1716.severity = none
 dotnet_diagnostic.CA1861.severity = none
 dotnet_diagnostic.CA2211.severity = none

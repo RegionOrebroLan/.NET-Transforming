@@ -4,12 +4,12 @@ using Xunit;
 
 namespace IntegrationTests
 {
-	public class FileTransformerFactoryTest(Fixture fixture) : IClassFixture<Fixture>
+	[Collection(FixtureCollection.Name)]
+	public class FileTransformerFactoryTest(Fixture fixture)
 	{
 		#region Fields
 
 		private readonly Fixture _fixture = fixture ?? throw new ArgumentNullException(nameof(fixture));
-		private static readonly string _resourcesPath = Path.Combine(Global.ProjectDirectory.FullName, "Resources", "FileTransformerFactoryTest");
 
 		#endregion
 
@@ -18,30 +18,30 @@ namespace IntegrationTests
 		[Fact]
 		public void Create_IfTheSourceIsAJsonFile_ShouldReturnAJsonTransformer()
 		{
-			Assert.True(this._fixture.FileTransformerFactory.Create(GetPath("appsettings.json")) is JsonTransformer);
+			Assert.True(this._fixture.FileTransformerFactory.Create(this.GetResourcePath("appsettings.json")) is JsonTransformer);
 		}
 
 		[Fact]
 		public void Create_IfTheSourceIsAXmlFile_ShouldReturnAXmlTransformer()
 		{
-			Assert.True(this._fixture.FileTransformerFactory.Create(GetPath("Web.config")) is XmlTransformer);
+			Assert.True(this._fixture.FileTransformerFactory.Create(this.GetResourcePath("Web.config")) is XmlTransformer);
 		}
 
 		[Fact]
 		public void Create_IfTheSourceIsNeitherAJsonFileNorAXmlFile_ShouldThrowAnInvalidOperationException()
 		{
-			Assert.Throws<InvalidOperationException>(() => this._fixture.FileTransformerFactory.Create(GetPath("File.txt")));
+			Assert.Throws<InvalidOperationException>(() => this._fixture.FileTransformerFactory.Create(this.GetResourcePath("File.txt")));
 		}
 
 		[Fact]
 		public void Create_IfTheSourceParameterDoesNotExistAsFile_ShouldThrowAnArgumentException()
 		{
-			Assert.Throws<ArgumentException>("source", () => this._fixture.FileTransformerFactory.Create(GetPath("Non-existing-file.txt")));
+			Assert.Throws<ArgumentException>("source", () => this._fixture.FileTransformerFactory.Create(this.GetResourcePath("Non-existing-file.txt")));
 		}
 
-		private static string GetPath(params string[] paths)
+		private string GetResourcePath(params string[] paths)
 		{
-			return Path.Combine(new[] { _resourcesPath }.Concat(paths).ToArray());
+			return this._fixture.GetResourcePath(new[] { "FileTransformerFactoryTest" }.Concat(paths).ToArray());
 		}
 
 		#endregion
