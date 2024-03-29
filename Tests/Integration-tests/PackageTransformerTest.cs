@@ -587,7 +587,7 @@ namespace IntegrationTests
 		}
 
 		[Fact]
-		public void Transform_IfTheSourceFilesHaveABom_ShouldResultInADestinationWithBomRegardingFilesInvolvedInTheTransformPattern()
+		public void Transform_IfTheSourceFilesHaveABom_ShouldResultInADestinationWithBomOnWindows_But_ShouldResultInADestinationWithNoBomOnNotWindows_RegardingFilesInvolvedInTheTransformPattern()
 		{
 			var destination = this.GetOutputPath(this.GetRandomPackageName(GetUniquelySuffixedValue("Transformed-Package")));
 			var fileToTransformPatterns = new[] { "**/*.config*", "**/*.json", "**/*.xml" };
@@ -620,7 +620,10 @@ namespace IntegrationTests
 			{
 				using(var streamReader = new StreamReader(file, true))
 				{
-					Assert.True(streamReader.HasByteOrderMark());
+					if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+						Assert.True(streamReader.HasByteOrderMark());
+					else
+						Assert.False(streamReader.HasByteOrderMark());
 				}
 			}
 		}
