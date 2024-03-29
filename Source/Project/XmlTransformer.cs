@@ -42,7 +42,7 @@ namespace RegionOrebroLan.Transforming
 
 							using(var streamReader = new StreamReader(stream, true))
 							{
-								var content = this.GetContent(options, streamReader);
+								var content = this.GetFileContent(options, streamReader);
 
 								var encoding = useByteOrderMark ? streamReader.CurrentEncoding : streamReader.CurrentEncoding.WithoutByteOrderMark();
 

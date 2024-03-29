@@ -3,11 +3,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RegionOrebroLan.Transforming.Configuration;
 using RegionOrebroLan.Transforming.IO;
-using RegionOrebroLan.Transforming.IO.Extensions;
 
 namespace RegionOrebroLan.Transforming
 {
-	public abstract class BasicFileTransformer : IFileTransformer
+	public abstract class BasicFileTransformer : BasicTransformer, IFileTransformer
 	{
 		#region Constructors
 
@@ -29,22 +28,6 @@ namespace RegionOrebroLan.Transforming
 		#endregion
 
 		#region Methods
-
-		protected internal virtual string GetContent(FileTransformingOptions options, StreamReader streamReader)
-		{
-			if(options == null)
-				throw new ArgumentNullException(nameof(options));
-
-			if(streamReader == null)
-				throw new ArgumentNullException(nameof(streamReader));
-
-			var content = streamReader.ReadToEnd();
-
-			if(options.Replacement.Enabled)
-				content = options.Replacement.Replace(content);
-
-			return content;
-		}
 
 		public virtual void Transform(string destination, string source, string transformation, FileTransformingOptions options = null)
 		{
@@ -83,17 +66,6 @@ namespace RegionOrebroLan.Transforming
 		}
 
 		protected internal abstract void TransformInternal(string destination, string source, string transformation, FileTransformingOptions options);
-
-		protected internal virtual bool UseByteOrderMark(FileTransformingOptions options, string source)
-		{
-			if(options == null)
-				throw new ArgumentNullException(nameof(options));
-
-			using(var streamReader = new StreamReader(source, true))
-			{
-				return streamReader.HasByteOrderMark() && !options.AvoidByteOrderMark;
-			}
-		}
 
 		#endregion
 	}

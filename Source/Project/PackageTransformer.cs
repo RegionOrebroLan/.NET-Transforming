@@ -1,13 +1,15 @@
 using System.Globalization;
+using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RegionOrebroLan.Transforming.Configuration;
 using RegionOrebroLan.Transforming.IO;
 using RegionOrebroLan.Transforming.IO.Extensions;
+using RegionOrebroLan.Transforming.Text.Extensions;
 
 namespace RegionOrebroLan.Transforming
 {
-	public class PackageTransformer : IPackageTransformer
+	public class PackageTransformer : BasicTransformer, IPackageTransformer
 	{
 		#region Fields
 
@@ -201,15 +203,13 @@ namespace RegionOrebroLan.Transforming
 
 		protected internal virtual IDictionary<string, ISet<string>> GetTransformMap(string directoryPath, IEnumerable<string> fileToTransformPatterns)
 		{
-			var transformMap = new Dictionary<string, ISet<string>>(StringComparer.OrdinalIgnoreCase);
+			var transformMap = new SortedDictionary<string, ISet<string>>(StringComparer.OrdinalIgnoreCase);
 
-			var filePathsInvolvedInTransformation = this.GetFilePathsToTransform(directoryPath, fileToTransformPatterns).ToArray();
+			var filePathsInvolvedInTransformation = this.GetFilePathsToTransform(directoryPath, fileToTransformPatterns).Select(path => this.FileSystem.Path.IsAbsolutePath(path) ? path : this.FileSystem.Path.Combine(directoryPath, path)).ToArray();
 
 			foreach(var path in filePathsInvolvedInTransformation)
 			{
-				var fullPath = this.FileSystem.Path.IsAbsolutePath(path) ? path : this.FileSystem.Path.Combine(directoryPath, path);
-
-				foreach(var source in this.GetSourcesForTransformation(fullPath))
+				foreach(var source in this.GetSourcesForTransformation(path))
 				{
 					if(!transformMap.TryGetValue(source, out var set))
 					{
@@ -217,8 +217,17 @@ namespace RegionOrebroLan.Transforming
 						transformMap.Add(source, set);
 					}
 
-					set.Add(fullPath);
+					set.Add(path);
 				}
+			}
+
+			// Add paths from the patterns-search that are not in the map already, either as key or in any value collection. So we can fix bom and line-breaks on them later if necessary, even if they are not involved in any transformations.
+			var existingPaths = new HashSet<string>(transformMap.Keys.Concat(transformMap.Values.SelectMany(value => value)), StringComparer.OrdinalIgnoreCase);
+			var pathsToAdd = filePathsInvolvedInTransformation.Where(path => !existingPaths.Contains(path)).ToArray();
+
+			foreach(var path in pathsToAdd)
+			{
+				transformMap.Add(path, new HashSet<string>(StringComparer.OrdinalIgnoreCase));
 			}
 
 			return transformMap;
@@ -234,34 +243,37 @@ namespace RegionOrebroLan.Transforming
 			return string.Equals(this.NormalizePath(firstPath), this.NormalizePath(secondPath), StringComparison.OrdinalIgnoreCase);
 		}
 
-		protected internal virtual void ReplaceFileContentIfNecessary(TransformingOptions options, string source)
-		{
-			if(!options.File.Replacement.Enabled)
-				return;
-
-			foreach(var path in this.FileSystem.Directory.GetFilesRecursive(source))
-			{
-				var content = this.FileSystem.File.ReadAllText(path);
-				var replaced = options.File.Replacement.Replace(content);
-
-				if(content != replaced)
-					this.FileSystem.File.WriteAllText(path, replaced);
-			}
-		}
-
 		protected internal virtual void Transform(string directoryPath, IEnumerable<string> fileToTransformPatterns, IEnumerable<string> transformationNames, TransformingOptions options)
 		{
 			foreach(var item in this.GetTransformInformation(directoryPath, fileToTransformPatterns, transformationNames))
 			{
-				foreach(var transformFileInformation in item.Value)
+				if(item.Value.Any())
 				{
-					if(!this.FileSystem.File.Exists(transformFileInformation.Key))
-						continue;
+					foreach(var transformFileInformation in item.Value)
+					{
+						if(!this.FileSystem.File.Exists(transformFileInformation.Key))
+							continue;
 
-					if(transformFileInformation.Value)
-						this.FileTransformerFactory.Create(item.Key).Transform(item.Key, item.Key, transformFileInformation.Key, options.File);
+						if(transformFileInformation.Value)
+							this.FileTransformerFactory.Create(item.Key).Transform(item.Key, item.Key, transformFileInformation.Key, options.File);
 
-					this.FileSystem.File.Delete(transformFileInformation.Key);
+						this.FileSystem.File.Delete(transformFileInformation.Key);
+					}
+				}
+				else
+				{
+					string content;
+					Encoding encoding;
+					var useByteOrderMark = this.UseByteOrderMark(options.File, item.Key);
+
+					using(var streamReader = new StreamReader(item.Key, true))
+					{
+						content = this.GetFileContent(options.File, streamReader);
+
+						encoding = useByteOrderMark ? streamReader.CurrentEncoding : streamReader.CurrentEncoding.WithoutByteOrderMark();
+					}
+
+					this.FileSystem.WriteFile(content, encoding, item.Key);
 				}
 			}
 		}
@@ -337,8 +349,6 @@ namespace RegionOrebroLan.Transforming
 				this.Transform(temporaryTransformDirectoryPath, fileToTransformPatterns, transformationNames, options);
 
 				this.DeleteItems(temporaryTransformDirectoryPath, pathToDeletePatterns);
-
-				this.ReplaceFileContentIfNecessary(options, temporaryTransformDirectoryPath);
 
 				packageWriter.Write(destination, temporaryTransformDirectoryPath);
 			}
