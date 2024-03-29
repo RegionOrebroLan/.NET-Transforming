@@ -2,6 +2,8 @@ using System.IO.Compression;
 using System.Runtime.InteropServices;
 using IntegrationTests.Fixtures;
 using IntegrationTests.Helpers;
+using RegionOrebroLan.Transforming.Configuration;
+using RegionOrebroLan.Transforming.IO.Extensions;
 
 namespace IntegrationTests
 {
@@ -439,6 +441,45 @@ namespace IntegrationTests
 		}
 
 		[Fact]
+		public void Transform_IfTheOptionsAreSetToAvoidBom_And_IfTheSourceFilesHaveABom_ShouldResultInADestinationWithNoBomRegardingFilesInvolvedInTheTransformPattern()
+		{
+			var destination = this.GetOutputPath(this.GetRandomPackageName(GetUniquelySuffixedValue("Transformed-Package")));
+			var fileToTransformPatterns = new[] { "**/*.config*", "**/*.json", "**/*.xml" };
+			var pathToDeletePatterns = new[] { "**/Directory-To-Delete/*", "**/File-To-Delete.*" };
+			var source = this.GetResourcePath("bom", this.GetRandomPackageName("Package"));
+			var transformationNames = new[] { "Release", "Test" };
+
+			this._fixture.PackageTransformer.Transform(destination, fileToTransformPatterns, pathToDeletePatterns, source, transformationNames, new TransformingOptions { File = new FileTransformingOptions { AvoidByteOrderMark = true } });
+
+			if(!Directory.Exists(destination))
+			{
+				var extractedDestination = this.GetOutputPath(Guid.NewGuid().ToString());
+				ZipFile.ExtractToDirectory(destination, extractedDestination);
+				destination = extractedDestination;
+			}
+
+			var sourceFiles = Directory.GetFiles(this.GetResourcePath("bom", "Package"), "*", SearchOption.AllDirectories).ToArray();
+
+			foreach(var file in sourceFiles)
+			{
+				using(var streamReader = new StreamReader(file, true))
+				{
+					Assert.True(streamReader.HasByteOrderMark());
+				}
+			}
+
+			var destinationFiles = Directory.GetFiles(destination, "*", SearchOption.AllDirectories).ToArray();
+
+			foreach(var file in destinationFiles)
+			{
+				using(var streamReader = new StreamReader(file, true))
+				{
+					Assert.False(streamReader.HasByteOrderMark());
+				}
+			}
+		}
+
+		[Fact]
 		public void Transform_IfThePathToDeletePatternsContainsAWholeDirectoryWithWildcards_ShouldTransformCorrectly()
 		{
 			var destination = this.GetOutputPath(this.GetRandomPackageName(GetUniquelySuffixedValue("Transformed-Package")));
@@ -543,6 +584,84 @@ namespace IntegrationTests
 			var expectedItems = this.GetFileSystemEntries(expected).ToArray();
 
 			Assert.True(actualItems.SequenceEqual(expectedItems, new FileComparer(destination, expected)));
+		}
+
+		[Fact]
+		public void Transform_IfTheSourceFilesHaveABom_ShouldResultInADestinationWithBomRegardingFilesInvolvedInTheTransformPattern()
+		{
+			var destination = this.GetOutputPath(this.GetRandomPackageName(GetUniquelySuffixedValue("Transformed-Package")));
+			var fileToTransformPatterns = new[] { "**/*.config*", "**/*.json", "**/*.xml" };
+			var pathToDeletePatterns = new[] { "**/Directory-To-Delete/*", "**/File-To-Delete.*" };
+			var source = this.GetResourcePath("bom", this.GetRandomPackageName("Package"));
+			var transformationNames = new[] { "Release", "Test" };
+
+			this._fixture.PackageTransformer.Transform(destination, fileToTransformPatterns, pathToDeletePatterns, source, transformationNames);
+
+			if(!Directory.Exists(destination))
+			{
+				var extractedDestination = this.GetOutputPath(Guid.NewGuid().ToString());
+				ZipFile.ExtractToDirectory(destination, extractedDestination);
+				destination = extractedDestination;
+			}
+
+			var sourceFiles = Directory.GetFiles(this.GetResourcePath("bom", "Package"), "*", SearchOption.AllDirectories).ToArray();
+
+			foreach(var file in sourceFiles)
+			{
+				using(var streamReader = new StreamReader(file, true))
+				{
+					Assert.True(streamReader.HasByteOrderMark());
+				}
+			}
+
+			var destinationFiles = Directory.GetFiles(destination, "*", SearchOption.AllDirectories).ToArray();
+
+			foreach(var file in destinationFiles)
+			{
+				using(var streamReader = new StreamReader(file, true))
+				{
+					Assert.True(streamReader.HasByteOrderMark());
+				}
+			}
+		}
+
+		[Fact]
+		public void Transform_IfTheSourceFilesHaveNoBom_ShouldResultInADestinationWithNoBomRegardingFilesInvolvedInTheTransformPattern()
+		{
+			var destination = this.GetOutputPath(this.GetRandomPackageName(GetUniquelySuffixedValue("Transformed-Package")));
+			var fileToTransformPatterns = new[] { "**/*.config*", "**/*.json", "**/*.xml" };
+			var pathToDeletePatterns = new[] { "**/Directory-To-Delete/*", "**/File-To-Delete.*" };
+			var source = this.GetResourcePath("no-bom", this.GetRandomPackageName("Package"));
+			var transformationNames = new[] { "Release", "Test" };
+
+			this._fixture.PackageTransformer.Transform(destination, fileToTransformPatterns, pathToDeletePatterns, source, transformationNames);
+
+			if(!Directory.Exists(destination))
+			{
+				var extractedDestination = this.GetOutputPath(Guid.NewGuid().ToString());
+				ZipFile.ExtractToDirectory(destination, extractedDestination);
+				destination = extractedDestination;
+			}
+
+			var sourceFiles = Directory.GetFiles(this.GetResourcePath("no-bom", "Package"), "*", SearchOption.AllDirectories).ToArray();
+
+			foreach(var file in sourceFiles)
+			{
+				using(var streamReader = new StreamReader(file, true))
+				{
+					Assert.False(streamReader.HasByteOrderMark());
+				}
+			}
+
+			var destinationFiles = Directory.GetFiles(destination, "*", SearchOption.AllDirectories).ToArray();
+
+			foreach(var file in destinationFiles)
+			{
+				using(var streamReader = new StreamReader(file, true))
+				{
+					Assert.False(streamReader.HasByteOrderMark());
+				}
+			}
 		}
 
 		[Fact]
