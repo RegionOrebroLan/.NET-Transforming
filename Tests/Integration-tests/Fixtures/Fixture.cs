@@ -16,7 +16,6 @@ namespace IntegrationTests.Fixtures
 
 		private FileTransformerFactory _fileTransformerFactory;
 		private JsonTransformer _jsonTransformer;
-		private static readonly object _outputDirectoryLock = new();
 		private string _outputDirectoryPath;
 		private PackageTransformer _packageTransformer;
 		private XmlTransformer _xmlTransformer;
@@ -34,18 +33,12 @@ namespace IntegrationTests.Fixtures
 			{
 				if(this._outputDirectoryPath == null)
 				{
-					lock(_outputDirectoryLock)
-					{
-						if(this._outputDirectoryPath == null)
-						{
-							var path = Path.Combine(Global.ProjectDirectory.FullName, "Test-output");
+					var path = Path.Combine(Global.ProjectDirectory.FullName, "Test-output", Environment.Version.ToString());
 
-							if(!Directory.Exists(path))
-								Directory.CreateDirectory(path);
+					if(!Directory.Exists(path))
+						Directory.CreateDirectory(path);
 
-							this._outputDirectoryPath = path;
-						}
-					}
+					this._outputDirectoryPath = path;
 				}
 
 				return this._outputDirectoryPath;
@@ -63,21 +56,19 @@ namespace IntegrationTests.Fixtures
 
 		public void Dispose()
 		{
-			lock(_outputDirectoryLock)
+			// The output-directory may still be locked by the tests, therefore we wait a bit and try again.
+			if(Directory.Exists(this._outputDirectoryPath))
 			{
-				if(Directory.Exists(this._outputDirectoryPath))
+				for(var i = 0; i < 20; i++)
 				{
-					for(var i = 0; i < 20; i++)
+					try
 					{
-						try
-						{
-							Directory.Delete(this._outputDirectoryPath, true);
-							break;
-						}
-						catch
-						{
-							Thread.Sleep(10);
-						}
+						Directory.Delete(this._outputDirectoryPath, true);
+						break;
+					}
+					catch
+					{
+						Thread.Sleep(10);
 					}
 				}
 			}

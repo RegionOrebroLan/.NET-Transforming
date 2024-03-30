@@ -7,6 +7,10 @@
 	</ItemGroup>
 	<ItemGroup>
 		<Folder Include="Resources/PackageTransformerTest/Empty" />
+		<Compile Remove="Test-output/**/*" />
+		<Content Remove="Test-output/**/*" />
+		<None Remove="Test-output/**/*" />
+		<None Include="Test-output/ReadMe.md" />
 	</ItemGroup>
 	<Target Name="EnsureFolders" BeforeTargets="BeforeBuild">
 		<MakeDir Condition="!Exists('%(Folder.FullPath)')" Directories="%(Folder.FullPath)" />

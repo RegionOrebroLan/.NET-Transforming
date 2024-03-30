@@ -401,3 +401,4 @@ FodyWeavers.xsd
 StrongName.snk
 
 Tests/Integration-tests/Test-output/*
+!Tests/Integration-tests/Test-output/ReadMe.md
