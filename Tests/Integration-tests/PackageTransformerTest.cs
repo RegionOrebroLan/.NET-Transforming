@@ -566,7 +566,7 @@ namespace IntegrationTests
 
 			var options = new TransformingOptions();
 			options.File.Replacement.Enabled = true;
-			options.File.Replacement.Replace = value => RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? value?.Replace("\r\n", "\n") : value?.Replace("\n", "\r\n");
+			options.File.Replacement.Replace = value => RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? value?.Replace("\r\n", "\n") : value?.Replace("\n", "\t");
 
 			this._fixture.PackageTransformer.Transform(destination, fileToTransformPatterns, pathToDeletePatterns, source, transformationNames, options);
 
@@ -613,7 +613,8 @@ namespace IntegrationTests
 				}
 				else
 				{
-					Assert.Contains("\r\n", content);
+					Assert.DoesNotContain("\n", content);
+					Assert.Contains("\t", content);
 				}
 			}
 		}
