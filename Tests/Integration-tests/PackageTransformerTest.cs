@@ -566,6 +566,7 @@ namespace IntegrationTests
 
 			var options = new TransformingOptions();
 			options.File.Replacement.Enabled = true;
+			options.File.Replacement.Replace = value => RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? value?.Replace("\r\n", "\n") : value?.Replace("\n", "\r\n");
 
 			this._fixture.PackageTransformer.Transform(destination, fileToTransformPatterns, pathToDeletePatterns, source, transformationNames, options);
 
@@ -585,7 +586,15 @@ namespace IntegrationTests
 
 				var content = File.ReadAllText(file);
 
-				Assert.Contains("\r\n", content);
+				if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+				{
+					Assert.Contains("\r\n", content);
+				}
+				else
+				{
+					Assert.DoesNotContain("\r\n", content);
+					Assert.Contains("\n", content);
+				}
 			}
 
 			var destinationFiles = Directory.GetFiles(destination, "*", SearchOption.AllDirectories).ToArray();
@@ -599,12 +608,12 @@ namespace IntegrationTests
 
 				if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 				{
-					Assert.Contains("\r\n", content);
+					Assert.DoesNotContain("\r\n", content);
+					Assert.Contains("\n", content);
 				}
 				else
 				{
-					Assert.DoesNotContain("\r\n", content);
-					Assert.Contains("\n", content);
+					Assert.Contains("\r\n", content);
 				}
 			}
 		}
