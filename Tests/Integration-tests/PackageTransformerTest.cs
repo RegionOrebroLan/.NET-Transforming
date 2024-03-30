@@ -480,6 +480,136 @@ namespace IntegrationTests
 		}
 
 		[Fact]
+		public void Transform_IfTheOptionsAreSetToExplicitReplace_ShouldWorkProperly()
+		{
+			var destination = this.GetOutputPath(this.GetRandomPackageName(GetUniquelySuffixedValue("Transformed-Package")));
+			var fileToTransformPatterns = new[] { "**/*.config*", "**/*.json", "**/*.xml" };
+			var pathToDeletePatterns = new[] { "**/Directory-To-Delete/*", "**/File-To-Delete.*" };
+			var source = this.GetResourcePath(this.GetRandomPackageName("Package"));
+			var transformationNames = new[] { "Release", "Test" };
+
+			var options = new TransformingOptions();
+			options.File.Replacement.Enabled = true;
+			options.File.Replacement.Replace = value => value?.Replace("\r\n", "\n").Replace("\n", "\t");
+
+			this._fixture.PackageTransformer.Transform(destination, fileToTransformPatterns, pathToDeletePatterns, source, transformationNames, options);
+
+			if(!Directory.Exists(destination))
+			{
+				var extractedDestination = this.GetOutputPath(Guid.NewGuid().ToString());
+				ZipFile.ExtractToDirectory(destination, extractedDestination);
+				destination = extractedDestination;
+			}
+
+			var destinationFiles = Directory.GetFiles(destination, "*", SearchOption.AllDirectories).ToArray();
+
+			foreach(var file in destinationFiles)
+			{
+				if(File.ReadAllLines(file).Length <= 1)
+					continue;
+
+				var content = File.ReadAllText(file);
+
+				Assert.DoesNotContain("\r\n", content);
+				Assert.DoesNotContain("\n", content);
+				Assert.Contains("\t", content);
+			}
+		}
+
+		[Fact]
+		public void Transform_IfTheOptionsAreSetToNotAvoidBom_And_IfTheSourceFilesHaveABom_ShouldResultInADestinationWithBomRegardingFilesInvolvedInTheTransformPattern()
+		{
+			var destination = this.GetOutputPath(this.GetRandomPackageName(GetUniquelySuffixedValue("Transformed-Package")));
+			var fileToTransformPatterns = new[] { "**/*.config*", "**/*.json", "**/*.xml" };
+			var pathToDeletePatterns = new[] { "**/Directory-To-Delete/*", "**/File-To-Delete.*" };
+			var source = this.GetResourcePath("bom", this.GetRandomPackageName("Package"));
+			var transformationNames = new[] { "Release", "Test" };
+
+			this._fixture.PackageTransformer.Transform(destination, fileToTransformPatterns, pathToDeletePatterns, source, transformationNames, new TransformingOptions { File = new FileTransformingOptions { AvoidByteOrderMark = false } });
+
+			if(!Directory.Exists(destination))
+			{
+				var extractedDestination = this.GetOutputPath(Guid.NewGuid().ToString());
+				ZipFile.ExtractToDirectory(destination, extractedDestination);
+				destination = extractedDestination;
+			}
+
+			var sourceFiles = Directory.GetFiles(this.GetResourcePath("bom", "Package"), "*", SearchOption.AllDirectories).ToArray();
+
+			foreach(var file in sourceFiles)
+			{
+				using(var streamReader = new StreamReader(file, true))
+				{
+					Assert.True(streamReader.HasByteOrderMark());
+				}
+			}
+
+			var destinationFiles = Directory.GetFiles(destination, "*", SearchOption.AllDirectories).ToArray();
+
+			foreach(var file in destinationFiles)
+			{
+				using(var streamReader = new StreamReader(file, true))
+				{
+					Assert.True(streamReader.HasByteOrderMark());
+				}
+			}
+		}
+
+		[Fact]
+		public void Transform_IfTheOptionsAreSetToReplace_ShouldWorkProperlyOnAllPlatforms()
+		{
+			var destination = this.GetOutputPath(this.GetRandomPackageName(GetUniquelySuffixedValue("Transformed-Package")));
+			var fileToTransformPatterns = new[] { "**/*.config*", "**/*.json", "**/*.xml" };
+			var pathToDeletePatterns = new[] { "**/Directory-To-Delete/*", "**/File-To-Delete.*" };
+			var source = this.GetResourcePath(this.GetRandomPackageName("Package"));
+			var transformationNames = new[] { "Release", "Test" };
+
+			var options = new TransformingOptions();
+			options.File.Replacement.Enabled = true;
+
+			this._fixture.PackageTransformer.Transform(destination, fileToTransformPatterns, pathToDeletePatterns, source, transformationNames, options);
+
+			if(!Directory.Exists(destination))
+			{
+				var extractedDestination = this.GetOutputPath(Guid.NewGuid().ToString());
+				ZipFile.ExtractToDirectory(destination, extractedDestination);
+				destination = extractedDestination;
+			}
+
+			var sourceFiles = Directory.GetFiles(this.GetResourcePath("Package"), "*", SearchOption.AllDirectories).ToArray();
+
+			foreach(var file in sourceFiles)
+			{
+				if(File.ReadAllLines(file).Length <= 1)
+					continue;
+
+				var content = File.ReadAllText(file);
+
+				Assert.Contains("\r\n", content);
+			}
+
+			var destinationFiles = Directory.GetFiles(destination, "*", SearchOption.AllDirectories).ToArray();
+
+			foreach(var file in destinationFiles)
+			{
+				if(File.ReadAllLines(file).Length <= 1)
+					continue;
+
+				var content = File.ReadAllText(file);
+
+				if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+				{
+					Assert.Contains("\r\n", content);
+				}
+				else
+				{
+					Assert.DoesNotContain("\r\n", content);
+					Assert.Contains("\n", content);
+				}
+			}
+		}
+
+		[Fact]
 		public void Transform_IfThePathToDeletePatternsContainsAWholeDirectoryWithWildcards_ShouldTransformCorrectly()
 		{
 			var destination = this.GetOutputPath(this.GetRandomPackageName(GetUniquelySuffixedValue("Transformed-Package")));
